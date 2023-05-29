@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaShoppingBag } from 'react-icons/fa';
+import { FaFileDownload, FaShoppingBag } from 'react-icons/fa';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 
 import GivingsList from '@/components/GivingsList.jsx';
@@ -9,9 +9,15 @@ const orders = () => {
     <div className="bg-gray-100 min-h-screen">
       <div className="flex justify-between px-4 pt-8">
         <h2 className="font-bold text-2xl">Givings</h2>
-        <button className="bg-purple-800 text-white px-4 py-2 rounded-lg">
-      Create giving type
-        </button>
+        <div className='flex items-center'>
+          <button className="bg-purple-800 text-white px-4 py-2 rounded-lg m-2">
+            Create giving type
+          </button>
+          <button className='hover:text-blue-500'>
+            <FaFileDownload size={30}/>
+            
+          </button>
+        </div>
       </div>
       <GivingsList />
       {/* <div className='p-4'>
