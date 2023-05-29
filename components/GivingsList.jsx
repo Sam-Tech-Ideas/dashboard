@@ -6,7 +6,7 @@ const GivingsList = () => {
       id: 1,
       name: "Bob Johnson",
       amount: "130",
-      email: "bob@example.com",
+    
       contact: "233559911251",
       type: "Offering",
       payment_method: "Card",
@@ -16,7 +16,7 @@ const GivingsList = () => {
       id: 2,
       name: "Bob Johnson",
       amount: "180",
-      email: "bob@example.com",
+    
       contact: "233559911251",
       type: "Offering",
       payment_method: "Card",
@@ -25,7 +25,7 @@ const GivingsList = () => {
     {
       id: 3,
       name: "Bob Johnson",
-      email: "bob@example.com",
+      
       contact: "233559911251",
       amount: "120",
       type: "Offering",
@@ -50,7 +50,7 @@ const GivingsList = () => {
           {users.map((user) => (
             <tr key={user.id}>
               <td className="border px-4 py-2">{user.name}</td>
-              <td className="border px-4 py-2">{user.email}</td>
+            
               <td className="border px-4 py-2">{user.contact}</td>
               <td className="border px-4 py-2">{user.amount}</td>
               <td className="border px-4 py-2">{user.type}</td>
