@@ -48,14 +48,14 @@ const GivingsList = () => {
         </thead>
         <tbody>
           {users.map((user) => (
-            <tr key={user.id}>
-              <td className="border px-4 py-2">{user.name}</td>
+            <tr key={user.id} className="text-center">
+              <td className="border-2 px-4 py-2">{user.name}</td>
             
-              <td className="border px-4 py-2">{user.contact}</td>
-              <td className="border px-4 py-2">{user.amount}</td>
-              <td className="border px-4 py-2">{user.type}</td>
-              <td className="border px-4 py-2">{user.payment_method}</td>
-              <td className="border px-4 py-2">{user.date}</td>
+              <td className="border-2 px-4 py-2">{user.contact}</td>
+              <td className="border-2 px-4 py-2">{user.amount}</td>
+              <td className="border-2 px-4 py-2">{user.type}</td>
+              <td className="border-2 px-4 py-2">{user.payment_method}</td>
+              <td className="border-2 px-4 py-2">{user.date}</td>
             </tr>
           ))}
         </tbody>
