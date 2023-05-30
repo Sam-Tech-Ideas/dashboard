@@ -12,6 +12,7 @@ const GivingsList = () => {
         const querySnapshot = await getDocs(collection(db, "givings"));
         const givingsData = querySnapshot.docs.map((doc) => doc.data());
         setGivings(givingsData);
+        console.log(givingsData);
       } catch (error) {
         console.log(error);
       }
@@ -19,7 +20,10 @@ const GivingsList = () => {
 
     fetchGivings();
   }, []);
-
+const formatDate = (timestamp) => {
+  const date = timestamp.toDate();
+  return date.toLocaleString(); // Adjust the formatting as per your requirements
+};
   return (
     <div className="overflow-x-auto p-4">
       <table className="min-w-full table-auto">
@@ -40,8 +44,8 @@ const GivingsList = () => {
               <td className="border-2 px-4 py-2">{giving.contact}</td>
               <td className="border-2 px-4 py-2">{giving.amount}</td>
               <td className="border-2 px-4 py-2">{giving.giving_type}</td>
-              <td className="border-2 px-4 py-2">{giving.payment_method}</td>
-              <td className="border-2 px-4 py-2">{giving.date}</td>
+              <td className="border-2 px-4 py-2">{giving.paymentMethod}</td>
+              <td className="border-2 px-4 py-2">{formatDate(giving.date_paid)}</td>
             </tr>
           ))}
         </tbody>
