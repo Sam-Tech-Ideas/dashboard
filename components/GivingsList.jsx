@@ -1,38 +1,73 @@
-import React from "react";
+import { db } from "../firebase/config";
+import React, { useEffect, useState } from "react";
 
 const GivingsList = () => {
-  const users = [
-    {
-      id: 1,
-      name: "Bob Johnson",
-      amount: "130",
+  const [giving, setGiving] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+
+  useEffect(() => {
+    const fetchGivings = async () => {
     
-      contact: "233559911251",
-      type: "Offering",
-      payment_method: "Card",
-      date: "May 24, 2023",
-    },
-    {
-      id: 2,
-      name: "Bob Johnson",
-      amount: "180",
+      try{
+       {/**Fetch data in a different way from firestore */}
+        setLoading(true);
+
+        const data = await db.collection("givings").get();
+        const giving = [];
+        data.forEach((doc) => {
+          giving.push({...doc.data(), id: doc.id});
+        });
+        
+        setGiving(data);
+
+
+      }
+      catch (error){
+        alert(error.message);
+      }
+
+      setLoading(false);
+    };
+    fetchGivings();
+  }, []);
+
+
+
+  // const users = [
+  //   {
+  //     id: 1,
+  //     name: "Bob Johnson",
+  //     amount: "130",
     
-      contact: "233559911251",
-      type: "Offering",
-      payment_method: "Card",
-      date: "May 24, 2023",
-    },
-    {
-      id: 3,
-      name: "Bob Johnson",
+  //     contact: "233559911251",
+  //     type: "Offering",
+  //     payment_method: "Card",
+  //     date: "May 24, 2023",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Bob Johnson",
+  //     amount: "180",
+    
+  //     contact: "233559911251",
+  //     type: "Offering",
+  //     payment_method: "Card",
+  //     date: "May 24, 2023",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Bob Johnson",
       
-      contact: "233559911251",
-      amount: "120",
-      type: "Offering",
-      payment_method: "Card",
-      date: "May 24, 2023",
-    },
-  ];
+  //     contact: "233559911251",
+  //     amount: "120",
+  //     type: "Offering",
+  //     payment_method: "Card",
+  //     date: "May 24, 2023",
+  //   },
+  // ];
+
+  
   return (
     <div className="overflow-x-auto p-4">
       <table className="min-w-full table-auto">
@@ -47,7 +82,7 @@ const GivingsList = () => {
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => (
+          {giving.map((giving) => (
             <tr key={user.id} className="text-center">
               <td className="border-2 px-4 py-2">{user.name}</td>
             
