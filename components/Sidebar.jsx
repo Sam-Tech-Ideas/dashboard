@@ -5,6 +5,7 @@ import { RxSketchLogo, RxDashboard, RxPerson } from "react-icons/rx";
 import { HiOutlineShoppingBag } from "react-icons/hi";
 import { FiSettings } from "react-icons/fi";
 import { BsCashCoin } from "react-icons/bs";
+import { FaCalendar } from "react-icons/fa";
 
 const Sidebar = ({ children }) => {
   return (
@@ -30,6 +31,11 @@ const Sidebar = ({ children }) => {
           <Link href="/orders">
             <div className="bg-gray-100 hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block">
               <BsCashCoin size={20} />
+            </div>
+          </Link>
+          <Link href="/events">
+            <div className="bg-gray-100 hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block">
+              <FaCalendar size={20} />
             </div>
           </Link>
           <Link href="/">
