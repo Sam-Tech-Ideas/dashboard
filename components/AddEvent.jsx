@@ -19,10 +19,20 @@ const AddEvent = () => {
   return (
     <div>
       <Fragment>
-        {/* <Button onClick={handleOpen} variant="gradient">
-          Add Event
-        </Button> */}
-
+        <div className="flex justify-between px-4 pt-8">
+          <h2 className="font-bold text-2xl">Events</h2>
+          <div className="flex items-center">
+            <button
+              className="bg-purple-800 text-white px-4 py-2 rounded-lg m-2"
+              onClick={handleOpen}
+            >
+              Add Event
+            </button>
+            {/* <button className="hover:text-blue-500">
+            <FaFileDownload size={30} />
+          </button> */}
+          </div>
+        </div>
 
         <Dialog
           open={open}
@@ -32,9 +42,7 @@ const AddEvent = () => {
             unmount: { scale: 0.9, y: -100 },
           }}
         >
-          <DialogHeader>
-            Create Event
-          </DialogHeader>
+          <DialogHeader>Create Event</DialogHeader>
           <DialogBody divider>
             <form action="">
               <div className="m-2">
@@ -79,15 +87,11 @@ const AddEvent = () => {
               </div>
 
               <div className="flex justify-between m-4">
+               
                 <button
-                  className="text-red-400  "
-                  onClick={handleOpen}
+                  className="bg-blue-400 text-white px-6 py-2 rounded-xl"
+                  onClick={""}
                 >
-                  <span>
-                    Cancel
-                  </span>
-                </button>
-                <button className="bg-blue-400 text-white px-6 py-2 rounded-xl" onClick={''}>
                   <span>Upload</span>
                 </button>
               </div>

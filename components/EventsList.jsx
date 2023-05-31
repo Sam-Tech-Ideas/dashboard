@@ -3,6 +3,7 @@ import { db } from "../firebase/config";
 import React, { useEffect, useState } from "react";
 import Loader from "./Loader";
 import AddEvent from "./AddEvent";
+import { FaFileDownload } from "react-icons/fa";
 
 
 
@@ -33,8 +34,8 @@ const EventsList = () => {
   };
   return (
     <>
-
-    <AddEvent/>
+     
+      <AddEvent />
       <div className="overflow-x-auto p-4">
         <table className="min-w-full table-auto">
           <thead>
