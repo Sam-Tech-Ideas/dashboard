@@ -1,6 +1,8 @@
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase/config";
 import React, { useEffect, useState } from "react";
+import Loader from "./Loader";
+
 
 const GivingsList = () => {
   const [givings, setGivings] = useState([]);
@@ -8,13 +10,16 @@ const GivingsList = () => {
 
   useEffect(() => {
     const fetchGivings = async () => {
+      setLoading(true);
       try {
         const querySnapshot = await getDocs(collection(db, "givings"));
         const givingsData = querySnapshot.docs.map((doc) => doc.data());
         setGivings(givingsData);
         console.log(givingsData);
+        setLoading(false);
       } catch (error) {
         console.log(error);
+        setLoading(false);
       }
     };
 
@@ -38,16 +43,28 @@ const formatDate = (timestamp) => {
           </tr>
         </thead>
         <tbody>
-          {givings.map((giving) => (
-            <tr key={giving.id} className="text-center">
-              <td className="border-2 px-4 py-2">{giving.name}</td>
-              <td className="border-2 px-4 py-2">{giving.contact}</td>
-              <td className="border-2 px-4 py-2">{giving.amount}</td>
-              <td className="border-2 px-4 py-2">{giving.giving_type}</td>
-              <td className="border-2 px-4 py-2">{giving.paymentMethod}</td>
-              <td className="border-2 px-4 py-2">{formatDate(giving.date_paid)}</td>
+          {loading ? (
+            <tr>
+              <td colSpan="6" className="text-center">
+                <div className="flex justify-center  items-center space-x-2">
+          <Loader/>
+                </div>
+              </td>
             </tr>
-          ))}
+          ) : (
+            givings.map((giving) => (
+              <tr key={giving.id}>
+                <td className="border px-4 py-2">{giving.name}</td>
+                <td className="border px-4 py-2">{giving.contact}</td>
+                <td className="border px-4 py-2">{giving.amount}</td>
+                <td className="border px-4 py-2">{giving.giving_type}</td>
+                <td className="border px-4 py-2">{giving.paymentMethod}</td>
+                <td className="border px-4 py-2">
+                  {formatDate(giving.date_paid)}
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </div>
