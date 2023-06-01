@@ -2,19 +2,15 @@ import React from 'react';
 import { BsPersonFill, BsThreeDotsVertical } from 'react-icons/bs';
 import { data } from '../data/data.js';
 import UserList from '@/components/UsersList.jsx';
+import AddUser from '@/components/AddUser.jsx';
 
 const customers = () => {
   return (
     <div className='bg-gray-100 min-h-screen'>
-      <div className='flex justify-between p-8'>
-        <h2 className='font-bold text-2xl'>Users</h2>
-        <button className='bg-purple-800 text-white px-4 py-2 rounded-lg'>
-          Add User
-        </button>
-
+     
         
     
-      </div>
+  <AddUser/>
       <UserList />
       {/* <div className='p-4'>
         <div className='w-full m-auto p-4 border rounded-lg bg-white overflow-y-auto'>

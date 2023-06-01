@@ -11,7 +11,7 @@ import {
   Input,
 } from "@material-tailwind/react";
 
-const AddPodcast = () => {
+const AddUser = () => {
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(!open);
@@ -19,13 +19,15 @@ const AddPodcast = () => {
     <div>
       <Fragment>
         <div className="flex justify-between px-4 pt-8">
-          <h2 className="font-bold text-2xl">Podcast Link</h2>
+          <h2 className="font-bold text-2xl">
+            Users
+          </h2>
           <div className="flex items-center">
             <button
               className="bg-purple-800 text-white px-4 py-2 rounded-lg m-2"
               onClick={handleOpen}
             >
-              Add Podcast Link
+                Add User
             </button>
             {/* <button className="hover:text-blue-500">
             <FaFileDownload size={30} />
@@ -41,18 +43,42 @@ const AddPodcast = () => {
             unmount: { scale: 0.9, y: -100 },
           }}
         >
-          <DialogHeader>Add Podcast Link</DialogHeader>
+          <DialogHeader>Add user</DialogHeader>
           <DialogBody divider>
             <form action="">
-              <div className="m-2">
-                <label htmlFor="">Podcast link</label>
+               <div className="m-2">
+                <label htmlFor="">User name</label>
                 <input
-                  type="url"
-                  placeholder="Podcast link"
+                  type="text"
+                  placeholder="User name"
                   className="border-2 border-gray-300 p-2 rounded-lg w-full"
                 />
               </div>
-              
+                <div className="m-2">
+                <label htmlFor="">User email</label>
+                <input
+                    type="text"
+                    placeholder="User email"
+                    className="border-2 border-gray-300 p-2 rounded-lg w-full"
+                />
+                </div>
+                <div className="m-2">
+                <label htmlFor="">User password</label>
+                <input
+                    type="text"
+                    placeholder="User password"
+                    className="border-2 border-gray-300 p-2 rounded-lg w-full"
+                />
+                </div>
+                <div className="m-2">   
+                <label htmlFor="">User role</label>
+                <select className="border-2 border-gray-300 p-2 rounded-lg w-full">
+                    <option value="admin">Admin</option>
+                    <option value="user">User</option>
+                </select>
+                
+                </div>
+               
 
               <div className="flex justify-between m-4">
                 <button
@@ -70,7 +96,7 @@ const AddPodcast = () => {
   );
 };
 
-export default AddPodcast;
+export default AddUser;
 
 //  <form onSubmit={addEvent}>
 //    <div className="flex flex-col">

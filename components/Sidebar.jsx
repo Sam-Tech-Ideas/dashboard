@@ -65,11 +65,11 @@ const Sidebar = ({ children }) => {
             </Tooltip>
           </Link>
           <Link href="/">
-            <Tooltip content="Settings" placement="right-end">
+            {/* <Tooltip content="Settings" placement="right-end">
               <div className="bg-gray-100 hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block">
                 <FiSettings size={20} />
               </div>
-            </Tooltip>
+            </Tooltip> */}
           </Link>
           <Link href="/Login">
             <Tooltip content="Log out" placement="right-end">
