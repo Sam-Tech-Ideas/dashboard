@@ -12,10 +12,17 @@ import {
 } from "@material-tailwind/react";
  
 const AddEvent = () => {
+  
 
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(!open);
+
+  handleAddEvent = () => {
+    console.log("Add Event");
+  };
+
+
   return (
     <div>
       <Fragment>
@@ -44,7 +51,7 @@ const AddEvent = () => {
         >
           <DialogHeader>Create Event</DialogHeader>
           <DialogBody divider>
-            <form action="">
+            <form onSubmit={''}>
               <div className="m-2">
                 <label htmlFor="">Event title</label>
                 <input

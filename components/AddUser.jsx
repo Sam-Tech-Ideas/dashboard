@@ -10,28 +10,65 @@ import {
   DialogFooter,
   Input,
 } from "@material-tailwind/react";
+import { collection, addDoc } from "firebase/firestore";
+
+import { auth, db } from "@/firebase/config";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { toast } from "react-hot-toast";
+import { doc } from "firebase/firestore";
 
 const AddUser = () => {
   const [open, setOpen] = useState(false);
+  const [username, setUsername] = useState("");
+  const [useremail, setUseremail] = useState("");
+  const userpassword = "eccl@2021";
+  const [userRole, setUserRole] = useState("");
 
   const handleOpen = () => setOpen(!open);
+
+  const handleCreateUser = async (e) => {
+    e.preventDefault();
+
+    try {
+
+      {/**I want to also create a user */}
+
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        useremail,
+        userpassword
+      );
+      // const user = userCredential.user;
+
+      // Add a new document with a generated id.
+      const docRef = await addDoc(collection(db, "users"), {
+        username: username,
+        email: useremail,
+        profileType: userRole,
+        
+
+      });
+      toast.success("User created successfully");
+      handleOpen();
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  // Add a new document with a generated id.
+
   return (
     <div>
       <Fragment>
         <div className="flex justify-between px-4 pt-8">
-          <h2 className="font-bold text-2xl">
-            Users
-          </h2>
+          <h2 className="font-bold text-2xl">Users</h2>
           <div className="flex items-center">
             <button
               className="bg-purple-800 text-white px-4 py-2 rounded-lg m-2"
               onClick={handleOpen}
             >
-                Add User
+              Add User
             </button>
-            {/* <button className="hover:text-blue-500">
-            <FaFileDownload size={30} />
-          </button> */}
           </div>
         </div>
 
@@ -45,45 +82,48 @@ const AddUser = () => {
         >
           <DialogHeader>Add user</DialogHeader>
           <DialogBody divider>
-            <form action="">
-               <div className="m-2">
+            <form onSubmit={handleCreateUser}>
+              <div className="m-2">
                 <label htmlFor="">User name</label>
                 <input
                   type="text"
                   placeholder="User name"
                   className="border-2 border-gray-300 p-2 rounded-lg w-full"
+                  required
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  //onChange={(e) => setUseremail(e.target.value)}
                 />
               </div>
-                <div className="m-2">
+              <div className="m-2">
                 <label htmlFor="">User email</label>
                 <input
-                    type="text"
-                    placeholder="User email"
-                    className="border-2 border-gray-300 p-2 rounded-lg w-full"
+                  type="email"
+                  required
+                  placeholder="User email"
+                  value={useremail}
+                  onChange={(e) => setUseremail(e.target.value)}
+                  className="border-2 border-gray-300 p-2 rounded-lg w-full"
                 />
-                </div>
-                <div className="m-2">
-                <label htmlFor="">User password</label>
-                <input
-                    type="text"
-                    placeholder="User password"
-                    className="border-2 border-gray-300 p-2 rounded-lg w-full"
-                />
-                </div>
-                <div className="m-2">   
+              </div>
+              <div className="m-2">
                 <label htmlFor="">User role</label>
-                <select className="border-2 border-gray-300 p-2 rounded-lg w-full">
-                    <option value="admin">Admin</option>
-                    <option value="user">User</option>
+                <select
+                  className="border-2 border-gray-300 p-2 rounded-lg w-full"
+                  required
+                  onChange={(e) => setUserRole(e.target.value)}
+                >
+                  {" "}
+                  <option value="">Select role</option>
+                  <option value="admin">Admin</option>
+                  <option value="user">User</option>
                 </select>
-                
-                </div>
-               
+              </div>
 
               <div className="flex justify-between m-4">
                 <button
                   className="bg-blue-400 text-white px-6 py-2 rounded-xl"
-                  onClick={""}
+                  type="submit"
                 >
                   <span>Upload</span>
                 </button>
