@@ -1,34 +1,45 @@
-//import React, { useState } from "react";
 
-
-
+import React, { useState } from "react";
+import { useRouter } from "next/router";
+import { auth } from "@/firebase/config";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { useState } from "react";
-//import Loader from "../components/Loader";
+import { toast } from "react-hot-toast";
 
-function Login() {
+const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  //const navigate = useNavigate();
   const handleLogin = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Signed in
-        const user = userCredential.user;
-        // ...
-        // setIsLoad//ing(false);
-        alert("Login successful");
-        //navigate("/");
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-      });
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      {/**check if profileType field is the same as admin 
+    Profiletype is a field in a users collection on firestore*/}
+      if (userCredential.user.profileType === "admin") {
+        router.push("/admin");
+      } else {
+        router.push("/");
+        toast.success("Login successful");
+        
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
+  
+     
+
+
+
+  
+
   return (
     <div
       className="relative min-h-screen flex flex-col items-center justify-center bg-no-repeat bg-cover bg-center"
@@ -36,7 +47,6 @@ function Login() {
         backgroundImage: `url(https://images.unsplash.com/photo-1438232992991-995b7058bbb3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Y2h1cmNofGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60)`,
       }}
     >
-      {/* {isLoading && <Loader />} */}
       <div className="absolute top-0 left-0 w-full h-full bg-gray-200 bg-opacity-50"></div>
       <div className="bg-white rounded-lg p-8 shadow-lg backdrop-filter backdrop-blur-md bg-opacity-40 z-10">
         <div className="flex flex-col items-center justify-center mb-8">

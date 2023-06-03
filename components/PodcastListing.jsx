@@ -36,14 +36,11 @@ const PodcastListing = () => {
   const deletePodcast = async (id) => {
     try {
       await deleteDoc(doc(db, "podcast", id));
-     toast.success("Event and image deleted successfully");
+     toast.success("Podcast  deleted successfully");
     } catch (error) {
       console.error("Error removing document: ", error);
       toast.error("Failed to delete event");
-      setLoading(
-        true,
-        setTimeout(() => {}, 1000)
-      );
+     
     }
   };
 

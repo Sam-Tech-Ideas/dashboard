@@ -16,6 +16,7 @@ import { auth, db } from "@/firebase/config";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { toast } from "react-hot-toast";
 import { doc } from "firebase/firestore";
+import { nanoid } from "nanoid";
 
 const AddUser = () => {
   const [open, setOpen] = useState(false);
@@ -43,6 +44,7 @@ const AddUser = () => {
 
       // Add a new document with a generated id.
       const docRef = await addDoc(collection(db, "users"), {
+        id:nanoid(),
         username: username,
         email: useremail,
         profileType: userRole,

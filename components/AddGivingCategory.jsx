@@ -71,7 +71,7 @@ const AddGivingCategory = () => {
             unmount: { scale: 0.9, y: -100 },
           }}
         >
-          <DialogHeader>Add user</DialogHeader>
+          <DialogHeader>Add Category</DialogHeader>
           <DialogBody divider>
             <form onSubmit={handleCreateCategory}>
               <div className="m-2">
@@ -95,8 +95,8 @@ const AddGivingCategory = () => {
                 >
                   {" "}
                   <option value="">Select category type</option>
-                  <option value="donation">Donation</option>
-                  <option value="pledges">Pledges</option>
+                  <option value="donation" className="">Donation</option>
+                  <option value="pledges" className="">Pledges</option>
                   <option value="tithe">Tithe</option>
                   <option value="offering">Offering</option>
                   <option value="others">Others</option>
