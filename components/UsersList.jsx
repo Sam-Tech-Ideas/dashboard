@@ -3,6 +3,7 @@ import { db } from "../firebase/config";
 import React, { useEffect, useState } from "react";
 import Loader from "./Loader";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import { toast } from "react-hot-toast";
 
 const UsersList = () => {
   const [users, setUsers] = useState([]); // [1]
@@ -25,6 +26,28 @@ const UsersList = () => {
 
     fetchUsers();
   }, []);
+
+  
+  const deleteUser = async (id, photo) => {
+    try {
+      await deleteDoc(doc(db, "users", id));
+      const storageRef = ref(storage, photo);
+      await deleteObject(storageRef);
+      console.log("Document successfully deleted!");
+      toast.success("Event and image deleted successfully");
+    } catch (error) {
+      console.error("Error removing document: ", error);
+      toast.success("Failed to delete event and image");
+      setLoading(
+        true,
+        setTimeout(() => {}, 1000)
+      );
+    }
+  };
+
+  
+
+
  
   return (
     <div className="overflow-x-auto p-4">
@@ -58,6 +81,7 @@ const UsersList = () => {
                     <FaTrashAlt
                       size={20}
                       className="text-red-500 cursor-pointer mx-4"
+                      onClick={() => deleteUser(giving.id, giving.photo)}
                     />
                     <FaEdit
                       size={20}

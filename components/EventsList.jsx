@@ -1,11 +1,11 @@
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../firebase/config";
 import React, { useEffect, useState } from "react";
 import Loader from "./Loader";
 import AddEvent from "./AddEvent";
 import { FaEdit, FaFileDownload, FaTrashAlt } from "react-icons/fa";
-
-
+import { toast } from "react-hot-toast";
+import { deleteObject, ref } from "firebase/storage";
 
 const EventsList = () => {
   const [events, setEvents] = useState([]);
@@ -16,9 +16,11 @@ const EventsList = () => {
       setLoading(true);
       try {
         const querySnapshot = await getDocs(collection(db, "events"));
-        const eventsData = querySnapshot.docs.map((doc) => doc.data());
+        const eventsData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
         setEvents(eventsData);
-        console.log(eventsData);
         setLoading(false);
       } catch (error) {
         console.log(error);
@@ -28,10 +30,30 @@ const EventsList = () => {
 
     fetchEvents();
   }, []);
+
   const formatDate = (timestamp) => {
     const date = timestamp.toDate();
-    return date.toLocaleString(); // Adjust the formatting as per your requirements
+    return date.toLocaleString();
   };
+
+  const deleteEvent = async (id, imageUrl) => {
+    try {
+      await deleteDoc(doc(db, "events", id));
+      const storageRef = ref(storage, imageUrl);
+      await deleteObject(storageRef);
+      console.log("Document successfully deleted!");
+      toast.success("Event and image deleted successfully");
+    } catch (error) {
+      console.error("Error removing document: ", error);
+      toast.success("Failed to delete event and image");
+      setLoading(true ,
+        setTimeout(() => {
+          
+        }, 1000)
+        );
+    }
+  };
+
   return (
     <>
       <AddEvent />
@@ -69,6 +91,7 @@ const EventsList = () => {
                       <FaTrashAlt
                         size={20}
                         className="text-red-500 cursor-pointer mx-4"
+                        onClick={() => deleteEvent(giving.id, giving.imageUrl)}
                       />
                       <FaEdit
                         size={20}

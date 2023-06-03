@@ -30,8 +30,9 @@ const AddUser = () => {
     e.preventDefault();
 
     try {
-
-      {/**I want to also create a user */}
+      {
+        /**I want to also create a user */
+      }
 
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -45,8 +46,6 @@ const AddUser = () => {
         username: username,
         email: useremail,
         profileType: userRole,
-        
-
       });
       toast.success("User created successfully");
       handleOpen();

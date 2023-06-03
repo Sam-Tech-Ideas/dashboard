@@ -10,11 +10,36 @@ import {
   DialogFooter,
   Input,
 } from "@material-tailwind/react";
+import { addDoc, collection } from "firebase/firestore";
+import { nanoid } from "nanoid";
+import { toast } from "react-hot-toast";
+import { db } from "@/firebase/config";
 
 const AddPodcast = () => {
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(!open);
+  const [podcast, setPodcast] = useState("");
+
+  const handleAddPodcast = async (e) => {
+    e.preventDefault();
+    console.log(podcast);
+
+    try{
+       const docRef = await addDoc(collection(db, "podcasts"), {
+        id: nanoid(),
+       link: podcast,
+     });
+     toast.success("Podcast created successfully");
+     handleOpen();
+   } catch (error) {
+     toast.error(error.message);
+   };
+
+   
+ 
+
+ };
   return (
     <div>
       <Fragment>
@@ -43,13 +68,15 @@ const AddPodcast = () => {
         >
           <DialogHeader>Add Podcast Link</DialogHeader>
           <DialogBody divider>
-            <form action="">
+            <form onSubmit={handleAddPodcast}>
               <div className="m-2">
                 <label htmlFor="">Podcast link</label>
                 <input
                   type="url"
                   placeholder="Podcast link"
                   className="border-2 border-gray-300 p-2 rounded-lg w-full"
+                  onChange={(e) => setPodcast(e.target.value)}
+                  value={podcast}
                 />
               </div>
               
@@ -57,7 +84,7 @@ const AddPodcast = () => {
               <div className="flex justify-between m-4">
                 <button
                   className="bg-blue-400 text-white px-6 py-2 rounded-xl"
-                  onClick={""}
+                  type="submit"
                 >
                   <span>Upload</span>
                 </button>
