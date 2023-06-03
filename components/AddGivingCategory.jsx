@@ -98,6 +98,8 @@ const AddGivingCategory = () => {
                   <option value="donation" className="">Donation</option>
                   <option value="pledges" className="">Pledges</option>
                   <option value="tithe">Tithe</option>
+                  <option value="seeds">Seeds</option>
+                  <option value="partnership">Partnership</option>
                   <option value="offering">Offering</option>
                   <option value="others">Others</option>
                 </select>
