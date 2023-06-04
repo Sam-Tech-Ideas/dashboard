@@ -96,7 +96,7 @@ const AddGivingCategory = () => {
                   {" "}
                   <option value="">Select category type</option>
                   <option value="donation" className="">Donation</option>
-                  <option value="pledges" className="">Pledges</option>
+                  <option value="pledges" className="">Ple  dges</option>
                   <option value="tithe">Tithe</option>
                   <option value="seeds">Seeds</option>
                   <option value="partnership">Partnership</option>
