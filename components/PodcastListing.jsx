@@ -35,14 +35,16 @@ const PodcastListing = () => {
 
   const deletePodcast = async (id) => {
     try {
-      await deleteDoc(doc(db, "podcast", id));
-     toast.success("Podcast  deleted successfully");
+      await deleteDoc(doc(db, "podcasts", id));
+
+      toast.success("Podcast deleted successfully");
+      {/**refresh page after deleting */}
+      window.location.reload();
     } catch (error) {
-      console.error("Error removing document: ", error);
-      toast.error("Failed to delete event");
-     
+      toast.error(error.message);
     }
   };
+
 
   return (
     <div className="overflow-x-auto p-4">

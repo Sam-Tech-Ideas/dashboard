@@ -10,36 +10,44 @@ import {
   DialogFooter,
   Input,
 } from "@material-tailwind/react";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 import { nanoid } from "nanoid";
 import { toast } from "react-hot-toast";
 import { db } from "@/firebase/config";
 
 const AddPodcast = () => {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleOpen = () => setOpen(!open);
-  const [podcast, setPodcast] = useState("");
+  const [podcast, setPodcast] = useState({
+    id: nanoid(),
+    link: "",
+  });
 
   const handleAddPodcast = async (e) => {
     e.preventDefault();
     console.log(podcast);
 
-    try{
-       const docRef = await addDoc(collection(db, "podcasts"), {
-        id: nanoid(),
-       link: podcast,
-     });
-     toast.success("Podcast created successfully");
-     handleOpen();
-   } catch (error) {
-     toast.error(error.message);
-   };
+    try {
+     const docRef = doc(db, "podcasts", podcast.id); // Replace `event.id` with the actual document ID
 
-   
- 
+     const podcastData = {
+       id: podcast.id,
+        link: podcast.link,
+      
+     }; 
+     setDoc(docRef, podcastData);
+      toast.success("Podcast created successfully");
+      handleOpen();
+      {/**refetch documents after deleting */}
+      console.log(podcast)
 
- };
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+ // "https://feeds.fireside.fm/bibleinayear/rss";
   return (
     <div>
       <Fragment>
@@ -75,11 +83,10 @@ const AddPodcast = () => {
                   type="url"
                   placeholder="Podcast link"
                   className="border-2 border-gray-300 p-2 rounded-lg w-full"
-                  onChange={(e) => setPodcast(e.target.value)}
-                  value={podcast}
+                  onChange={(e) => setPodcast({ ...podcast, link: e.target.value })}
+                  value={podcast.link}
                 />
               </div>
-              
 
               <div className="flex justify-between m-4">
                 <button
@@ -98,5 +105,3 @@ const AddPodcast = () => {
 };
 
 export default AddPodcast;
-
-
