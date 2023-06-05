@@ -12,7 +12,7 @@ import {
   Progress,
 } from "@material-tailwind/react";
 import { toast } from "react-hot-toast";
-import { addDoc, collection, doc } from "firebase/firestore";
+import {  Timestamp, addDoc, collection, doc, setDoc } from "firebase/firestore";
 import { db, storage } from "@/firebase/config";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { nanoid } from "nanoid";
@@ -20,84 +20,81 @@ import { nanoid } from "nanoid";
 const AddEvent = () => {
   const [open, setOpen] = useState(false);
 
-
-
   const handleOpen = () => setOpen(!open);
- const [event, setEvent] = useState({
-  //     // use the seconds from the date object for the id
-       id: nanoid(),
+  const [event, setEvent] = useState({
+    //     // use the seconds from the date object for the id
+    id: nanoid(),
 
-      title: "",
-      description: "",
-      imageUrl: "",
-     link: "",
+    title: "",
+    description: "",
+    imageUrl: "",
+    link: "",
 
-       date: "",
-       videoLink: "",
-       
-      });
+    date: "",
+    videoLink: "",
+  });
 
-    const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
-    
-    const handleInputChange = (e) => {
-      const { name, value } = e.target;
-      setEvent({ ...event, [e.target.name]: value });
-    };
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEvent({ ...event, [e.target.name]: value });
+  };
 
-     const handleImageChange = (e) => {
-     const file = e.target.files[0];
-       console.log(file);
+   const handleImageChange = (e) => {
+   const file = e.target.files[0];
+     console.log(file);
 
-       const storageRef = ref(storage, `Eimages/${Date.now()}${file.name}`);
-       const uploadTask = uploadBytesResumable(storageRef, file);
+     const storageRef = ref(storage, `Eimages/${Date.now()}${file.name}`);
+     const uploadTask = uploadBytesResumable(storageRef, file);
 
-       uploadTask.on(
-        "state_changed",
-         (snapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-       setUploadProgress(progress);
-         },
-         (error) => {
-           alert(error.message);
+     uploadTask.on(
+      "state_changed",
+       (snapshot) => {
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+     setUploadProgress(progress);
        },
-      () => {
-         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            setEvent({ ...event, imageUrl: downloadURL });
-          alert("Image uploaded successfully");
+       (error) => {
+         alert(error.message);
+     },
+    () => {
+       getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          setEvent({ ...event, imageUrl: downloadURL });
+        alert("Image uploaded successfully");
 
-         console.log("File available at", downloadURL);
-         });
-         }
-       );
-     };
+       console.log("File available at", downloadURL);
+       });
+       }
+     );
+   };
 
-     const handleAddEvent = async (e) => {
-       e.preventDefault();
-       console.log(event);
+  const handleAddEvent = async (e) => {
+    e.preventDefault();
+    console.log(event);
 
-     try {
-        const docRef = doc(db, "events", event.id); // Replace `event.id` with the actual document ID
+    try {
+      const docRef = doc(db, "events", event.id); // Replace `event.id` with the actual document ID
 
-        const eventData = {
-          id: event.id,
-          title: event.title,
-          description: event.description,
-          imageUrl: event.imageUrl,
-          link: event.link,
-          date: event.date,
-        };
-        
-        await addDoc(collection(db, "events"), eventData);
-        //console.log("Document written with ID: ", docRef.id);
-      } catch (error) {
-        console.log(error);
-        alert(error.message);
-      }
-    };
+      const eventData = {
+        id: event.id,
+        title: event.title,
+        description: event.description,
+        imageUrl: event.imageUrl,
+        link: event.link,
+        date: Timestamp.fromDate(new Date(event.date)),
+      };
 
+      await setDoc(docRef, eventData);
+      toast.success("Event created successfully");
+      handleOpen();
 
+      //console.log("Document written with ID: ", docRef.id);
+    } catch (error) {
+      console.log(error);
+      alert(error.message);
+    }
+  };
 
   return (
     <div>
@@ -135,6 +132,8 @@ const AddEvent = () => {
                   placeholder="Event title"
                   className="border-2 border-gray-300 p-2 rounded-lg w-full"
                   onChange={handleInputChange}
+                  value={event.title}
+                  name="title"
                 />
               </div>
               <div className="m-2">
@@ -144,6 +143,8 @@ const AddEvent = () => {
                   placeholder="Event description"
                   className="border-2 border-gray-300 p-2 rounded-lg w-full"
                   onChange={handleInputChange}
+                  value={event.description}
+                  name="description"
                 />
               </div>
               <div className="m-2">
@@ -153,13 +154,15 @@ const AddEvent = () => {
                   placeholder="Event date"
                   className="border-2 border-gray-300 p-2 rounded-lg w-full"
                   onChange={handleInputChange}
+                  value={event.date}
+                  name="date"
                 />
               </div>
-              {/**sermon image*/}
+
               {uploadProgress === 0 ? null : (
                 <Progress value={uploadProgress} color="blue" />
               )}
-              {/* <Progress value={50} label="Completed" /> */}
+              
               <div className="flex flex-col mt-2">
                 <label htmlFor="imageUrl">Upload Image</label>
                 <input
@@ -178,14 +181,14 @@ const AddEvent = () => {
                     value={event.imageUrl}
                     disabled
                   />
-                )}
+                )} 
               </div>
+             
 
-              
               <div className="m-2">
-                <label htmlFor="">Event link</label>
+                <label htmlFor="">Event Video link</label>
                 <input
-                  type="text"
+                  type="url"
                   placeholder="Event video link"
                   className="border-2 border-gray-300 p-2 rounded-lg w-full"
                   name="link"
@@ -197,7 +200,7 @@ const AddEvent = () => {
               <div className="flex justify-between m-4">
                 <button
                   className="bg-blue-400 text-white px-6 py-2 rounded-xl"
-                  onClick={""}
+                  type="submit"
                 >
                   <span>Upload</span>
                 </button>

@@ -10,7 +10,7 @@ import {
   DialogFooter,
   Input,
 } from "@material-tailwind/react";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, setDoc } from "firebase/firestore";
 
 import { auth, db } from "@/firebase/config";
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -21,8 +21,12 @@ import { FaFileDownload } from "react-icons/fa";
 
 const AddGivingCategory = () => {
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [type, setType] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [category, setCategory] = useState({
+    id: nanoid(),
+    name: "",
+    type: "",
+  }); 
 
   const handleOpen = () => setOpen(!open);
 
@@ -30,20 +34,22 @@ const AddGivingCategory = () => {
     e.preventDefault();
 
     try {
-      // Add a new document with a generated id.
-      const docRef = await addDoc(collection(db, "category"), {
-        id: nanoid(),
-        name: name,
-        type: type,
-      });
-      toast.success("Category created successfully");
+      const docRef = doc(db, "subcategory", category.id); // Replace `event.id` with the actual document ID
+
+      const categoryData = {
+        id: category.id,
+        name: category.name,
+        type: category.type,
+      };
+      setDoc(docRef, categoryData);
+      toast.success("Subcategory created successfully");
       handleOpen();
+
+      console.log(category);
     } catch (error) {
       toast.error(error.message);
     }
   };
-
-  // Add a new document with a generated id.
 
   return (
     <div>
@@ -55,7 +61,7 @@ const AddGivingCategory = () => {
               className="bg-purple-800 text-white px-4 py-2 rounded-lg m-2"
               onClick={handleOpen}
             >
-              Create category
+              Create Sub category
             </button>
             <button className="hover:text-blue-500">
               <FaFileDownload size={30} />
@@ -81,24 +87,30 @@ const AddGivingCategory = () => {
                   placeholder="Category name"
                   className="border-2 border-gray-300 p-2 rounded-lg w-full"
                   required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) =>
+                    setCategory({ ...category, name: e.target.value })
+                  }
+                  value={category.name}
                 />
               </div>
 
               <div className="m-2">
-                <label htmlFor="">Category type</label>
+                <label htmlFor="">Subcategory type</label>
                 <select
                   className="border-2 border-gray-300 p-2 rounded-lg w-full"
                   required
-                  onChange={(e) => setType(e.target.value)}
+                  value={category.type}
+                  onChange={(e) =>
+                    setCategory({ ...category, type: e.target.value })
+                  }
                 >
-                  {" "}
                   <option value="">Select category type</option>
-                  <option value="donation" className="">Donation</option>
-                  <option value="pledges" className="">Ple  dges</option>
+                  <option value="donation" className="">
+                    Donation
+                  </option>
+
                   <option value="tithe">Tithe</option>
-                  <option value="seeds">Seeds</option>
+
                   <option value="partnership">Partnership</option>
                   <option value="offering">Offering</option>
                   <option value="others">Others</option>
