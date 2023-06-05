@@ -63,14 +63,7 @@ const AddUser = () => {
       <Fragment>
         <div className="flex justify-between px-4 pt-8">
           <h2 className="font-bold text-2xl">Users</h2>
-          <div className="flex items-center">
-            <button
-              className="bg-purple-800 text-white px-4 py-2 rounded-lg m-2"
-              onClick={handleOpen}
-            >
-              Add User
-            </button>
-          </div>
+         
         </div>
 
         <Dialog
@@ -81,7 +74,7 @@ const AddUser = () => {
             unmount: { scale: 0.9, y: -100 },
           }}
         >
-          <DialogHeader>Add user</DialogHeader>
+          <DialogHeader>Assign role</DialogHeader>
           <DialogBody divider>
             <form onSubmit={handleCreateUser}>
               <div className="m-2">

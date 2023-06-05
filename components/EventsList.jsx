@@ -1,5 +1,11 @@
-import { collection, getDocs, deleteDoc, doc, Timestamp } from "firebase/firestore";
-import { db } from "../firebase/config";
+import {
+  collection,
+  getDocs,
+  deleteDoc,
+  doc,
+  Timestamp,
+} from "firebase/firestore";
+import { db, storage } from "../firebase/config";
 import React, { useEffect, useState } from "react";
 import Loader from "./Loader";
 import AddEvent from "./AddEvent";
@@ -31,27 +37,28 @@ const EventsList = () => {
     fetchEvents();
   }, []);
 
- 
-
   const deleteEvent = async (id, imageUrl) => {
-    // try {
-    //   await deleteDoc(doc(db, "events", id));
-    //   const storageRef = ref(storage, imageUrl);
-    //   await deleteObject(storageRef);
-    //   console.log("Document successfully deleted!");
-    //   toast.success("Event and image deleted successfully");
-    // } catch (error) {
-    //   console.error("Error removing document: ", error);
-    //   toast.success("Failed to delete event and image");
-     
-        
-    // }
+    try {
+      await deleteDoc(doc(db, "events", id));
+      const storageRef = ref(storage, imageUrl);
+      await deleteObject(storageRef);
+      toast.success("Event deleted successfully");
+      setLoading(true, 
+         setTimeout(() => {
+          setLoading(false);
+        }, 300)
+
+        );
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
- const formatDate = (timestamp) => {
-   const date = timestamp.toDate();
-   const formattedDate = date.toLocaleDateString(); // Extract only the date portion
-   return formattedDate;
- };
+
+  const formatDate = (timestamp) => {
+    const date = timestamp.toDate();
+    const formattedDate = date.toLocaleDateString(); // Extract only the date portion
+    return formattedDate;
+  };
 
   return (
     <>

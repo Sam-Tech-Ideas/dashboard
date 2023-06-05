@@ -21,6 +21,7 @@ const AddEvent = () => {
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(!open);
+  
   const [event, setEvent] = useState({
     //     // use the seconds from the date object for the id
     id: nanoid(),
@@ -87,6 +88,7 @@ const AddEvent = () => {
 
       await setDoc(docRef, eventData);
       toast.success("Event created successfully");
+    
       handleOpen();
 
       //console.log("Document written with ID: ", docRef.id);
