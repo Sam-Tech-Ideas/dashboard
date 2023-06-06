@@ -1,15 +1,30 @@
-import { collection, deleteDoc, doc, getDocs, setDoc } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  setDoc,
+} from "firebase/firestore";
 import { db, storage } from "../firebase/config";
 import React, { useEffect, useState } from "react";
 import Loader from "./Loader";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { toast } from "react-hot-toast";
 import { deleteObject, ref } from "firebase/storage";
-import { Tooltip } from "@material-tailwind/react";
+import {
+  Dialog,
+  DialogBody,
+  DialogHeader,
+  Tooltip,
+} from "@material-tailwind/react";
 
 const UsersList = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [user, setUser] = useState({});
+
+  const handleOpen = () => setOpen(!open);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -28,29 +43,62 @@ const UsersList = () => {
     fetchUsers();
   }, []);
 
-  const updateUserProfileType = async (id, newProfileType) => {
+  const editHandler = async (e) => {
+    e.preventDefault();
+    console.log("Edit");
     try {
-      await setDoc(doc(db, "users", id), { profileType: newProfileType });
-      toast.success("User profile type updated successfully");
+      const docRef = doc(db, "users", user.id);
+      const userData = {
+        id: user.id,
+        fullName: user.fullName,
+        photo: user.photo,
+        username: user.username,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        profileType: user.profileType,
+      };
+      await setDoc(docRef, userData);
+      toast.success("User updated successfully");
+      handleOpen();
     } catch (error) {
-      console.error("Error updating user profile type: ", error);
-      toast.error("Failed to update user profile type");
-    }
-  };
-
-  const deleteUser = async (id, photo) => {
-    try {
-      await deleteDoc(doc(db, "users", id));
-      await deleteObject(ref(storage, photo));
-      toast.success("User deleted successfully");
-    } catch (error) {
-      console.error("Error removing document: ", error);
-      toast.error("Failed to delete user and image");
+      console.log(error);
     }
   };
 
   return (
     <div className="overflow-x-auto p-4">
+      <Dialog open={open} handler={handleOpen}>
+        <DialogHeader>Assign role.</DialogHeader>
+        <DialogBody divider>
+          <form onSubmit={editHandler}>
+            <div className="mb-4 mx-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Role
+              </label>
+              <select
+                name=""
+                id=""
+                className="p-2 w-full "
+                value={user.profileType}
+                onChange={(e) =>
+                  setUser({ ...user, profileType: e.target.value })
+                }
+              >
+                <option value="">Select Role</option>
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+
+            <button
+              type="submit"
+              className="bg-green-300 px-4 py-1 rounded text-white"
+            >
+              <span>Update</span>
+            </button>
+          </form>
+        </DialogBody>
+      </Dialog>
       <table className="min-w-full table-auto">
         <thead>
           <tr>
@@ -71,34 +119,31 @@ const UsersList = () => {
               </td>
             </tr>
           ) : users && users.length > 0 ? (
-            users.map((user) => (
-              <tr key={user.id} className="text-center">
-                <td className="border-2 px-4 py-2">{user.fullName}</td>
-                <td className="border-2 px-4 py-2">{user.email}</td>
-                <td className="border-2 px-4 py-2">{user.phoneNumber}</td>
-                <td className="border-2 px-4 py-2">{user.profileType}</td>
+            users.map((giving) => (
+              <tr key={giving.id} className="text-center">
+                <td className="border-2 px-4 py-2">{giving.fullName}</td>
+                <td className="border-2 px-4 py-2">{giving.email}</td>
+                <td className="border-2 px-4 py-2">{giving.phoneNumber}</td>
+                <td className="border-2 px-4 py-2">{giving.profileType}</td>
                 <td className="border-2 px-4 py-2">
                   <Tooltip
                     content="Assign Role"
                     placement="top"
                     color="lightBlue"
                   >
-                    <div className="flex">
-                      <FaTrashAlt
-                        size={20}
-                        className="text-red-500 cursor-pointer mx-4"
-                        onClick={() => deleteUser(user.id, user.photo)}
-                      />
+                    <div className="flex  ">
+                      {/* <FaTrashAlt
+                      size={20}
+                      className="text-red-500 cursor-pointer mx-4"
+                      onClick={() => deleteUser(giving.id, giving.photo)}
+                    /> */}
+
                       <FaEdit
                         size={20}
                         className="text-green-500 cursor-pointer"
                         onClick={() => {
-                          const newProfileType = prompt(
-                            "Enter the new profile type:"
-                          );
-                          if (newProfileType) {
-                            updateUserProfileType(user.id, newProfileType);
-                          }
+                          handleOpen();
+                          setUser(giving);
                         }}
                       />
                     </div>
