@@ -5,10 +5,11 @@ import { RxSketchLogo, RxDashboard, RxPerson } from "react-icons/rx";
 import { HiOutlineShoppingBag } from "react-icons/hi";
 import { FiSettings } from "react-icons/fi";
 import { BsCashCoin } from "react-icons/bs";
-import {AiOutlineExport} from "react-icons/ai";
-import { FaCalendar, FaLongArrowAltRight, FaMicrophone, FaMicrophoneAlt, FaPodcast } from "react-icons/fa";
+import {AiFillNotification, AiOutlineExport, AiTwotoneNotification} from "react-icons/ai";
+import { FaCalendar, FaItunesNote, FaLongArrowAltRight, FaMicrophone, FaMicrophoneAlt, FaPodcast } from "react-icons/fa";
 import { Tooltip, Button } from "@material-tailwind/react";
 import { useRouter } from "next/router";
+import { BellIcon } from "lucide-react";
  
 const Sidebar = ({ children }) => {
    const router = useRouter();
@@ -43,7 +44,7 @@ const Sidebar = ({ children }) => {
               </div>
             </Tooltip>
           </Link>
-          <Link href="/orders">
+          <Link href="/givings">
             <Tooltip content="Givings" placement="right-end">
               <div className="bg-gray-100 hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block">
                 <BsCashCoin size={20} />
@@ -64,12 +65,12 @@ const Sidebar = ({ children }) => {
               </div>
             </Tooltip>
           </Link>
-          <Link href="/">
-            {/* <Tooltip content="Settings" placement="right-end">
+          <Link href="/Notification">
+             <Tooltip content="Notifications" placement="right-end">
               <div className="bg-gray-100 hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block">
-                <FiSettings size={20} />
+                <BellIcon size={20} />
               </div>
-            </Tooltip> */}
+            </Tooltip> 
           </Link>
           <Link href="/Login">
             <Tooltip content="Log out" placement="right-end">
@@ -78,6 +79,7 @@ const Sidebar = ({ children }) => {
               </div>
             </Tooltip>
           </Link>
+          
         </div>
       </div>
       <main className="ml-20 w-full">{children}</main>

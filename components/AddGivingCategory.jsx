@@ -51,6 +51,8 @@ const AddGivingCategory = () => {
     }
   };
 
+  
+
   return (
     <div>
       <Fragment>
@@ -63,9 +65,7 @@ const AddGivingCategory = () => {
             >
               Create Sub category
             </button>
-            <button className="hover:text-blue-500">
-              <FaFileDownload size={30} />
-            </button>
+           
           </div>
         </div>
 
@@ -122,7 +122,11 @@ const AddGivingCategory = () => {
                   className="bg-blue-400 text-white px-6 py-2 rounded-xl"
                   type="submit"
                 >
-                  <span>Upload</span>
+                  <span>
+                   
+                    Create
+                    
+                  </span>
                 </button>
               </div>
             </form>
