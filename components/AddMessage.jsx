@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 //import { Button } from "@/components/ui/button";
 
 import { Fragment, useState } from "react";
@@ -10,7 +10,7 @@ import {
   DialogFooter,
   Input,
 } from "@material-tailwind/react";
-import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+import { addDoc, collection, doc, getDocs, setDoc } from "firebase/firestore";
 import { nanoid } from "nanoid";
 import { toast } from "react-hot-toast";
 import { db } from "@/firebase/config";
@@ -18,6 +18,7 @@ import { db } from "@/firebase/config";
 const AddMessage = () => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [data, setData] = useState(null);
 
   const handleOpen = () => setOpen(!open);
 
@@ -27,39 +28,53 @@ const AddMessage = () => {
     message: "",
     recipient: [], //this is an array of users
     read: [],
-    date: new Date().toLocaleString(),
+    date: new Date(),          //this is the date the notification was created
   });
+useEffect(() => {
+  const fetchData = async () => {
+    const querySnapshot = await getDocs(collection(db, "devices"));
+    const tokens = [];
+
+    querySnapshot.forEach((doc) => {
+      const specificField = doc.data().fcmToken;
+      tokens.push(specificField);
+    });
+
+    setData(tokens);
+  };
+
+  fetchData();
+}, []);
+
+
+   console.log(data);
+
 
   const handleAddNotification = async (e) => {
     e.preventDefault();
-    console.log(notification);
 
-    
     try {
-      const docRef = doc(db, "notifications", notification.id); // Replace `event.id` with the actual document ID
+      const docRef = doc(db, "notifications", notification.id);
 
       const notificationData = {
         id: notification.id,
         title: notification.title,
         message: notification.message,
-
-        recipient: notification.recipient,
+        recipient: [...notification.recipient, ...data], // Add the fetched data to the recipient array
         read: notification.read,
         date: notification.date,
       };
 
-      setDoc(docRef, notificationData);
+      await setDoc(docRef, notificationData);
       toast.success("Notification created successfully");
       handleOpen();
 
-      {
-        /**refetch documents after deleting */
-      }
-      console.log(notification);
+      // ...
     } catch (error) {
       toast.error(error.message);
     }
   };
+
 
   return (
     <div>
@@ -123,7 +138,7 @@ const AddMessage = () => {
                   className="bg-blue-400 text-white px-6 py-2 rounded-xl"
                   type="submit"
                 >
-                  <span>Upload</span>
+                  <span>Send</span>
                 </button>
               </div>
             </form>
