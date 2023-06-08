@@ -11,6 +11,9 @@ const GivingsList = () => {
   const [loading, setLoading] = useState(false);
   const [category, setCategory] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+
 
   useEffect(() => {
     const fetchGivings = async () => {
@@ -43,9 +46,39 @@ const GivingsList = () => {
     { label: "Date", key: "date_paid" },
   ];
 
+  const handleCategoryChange = (event) => {
+    setCategory(event.target.value);
+  };
+
+  const handleSearchTermChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+   const handleDateFromChange = (event) => {
+     setDateFrom(event.target.value);
+   };
+
+   const handleDateToChange = (event) => {
+     setDateTo(event.target.value);
+   };
+
+
+  const filteredGivings = givings.filter((giving) => {
+    const givingDate = giving.date_paid.toDate();
+    const selectedDateFrom = dateFrom ? new Date(dateFrom) : null;
+    const selectedDateTo = dateTo ? new Date(dateTo) : null;
+
+    return (
+      (category === "" || giving.giving_type === category) &&
+      (searchTerm === "" ||
+        giving.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        giving.contact.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (selectedDateFrom === null || givingDate >= selectedDateFrom) &&
+      (selectedDateTo === null || givingDate <= selectedDateTo)
+    );
+  });
   const csvData = [
     ["Name", "Contact", "Amount", "Payment Type", "Payment Method", "Date"],
-    ...givings.map((giving) => [
+    ...filteredGivings.map((giving) => [
       giving.name,
       giving.contact,
       giving.amount,
@@ -54,23 +87,6 @@ const GivingsList = () => {
       formatDate(giving.date_paid),
     ]),
   ];
-
-  const handleCategoryChange = (event) => {
-    setCategory(event.target.value);
-  };
-
-  const handleSearchTermChange = (event) => {
-    setSearchTerm(event.target.value);
-  };
-
-  const filteredGivings = givings.filter((giving) => {
-    return (
-      (category === "" || giving.giving_type === category) &&
-      (searchTerm === "" ||
-        giving.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        giving.contact.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
-  });
 
   return (
     <>
@@ -93,9 +109,9 @@ const GivingsList = () => {
                 </option>
                 <option value="Donation">Donation</option>
 
-                <option value="Tithe">Tithe</option>
+                <option value="tithe">Tithe</option>
                 <option value="Offering">Offering</option>
-                <option value="Partnership">Pledge</option>
+                <option value="Partnership">Partnership</option>
 
                 <option value="Other">Other</option>
               </select>
@@ -107,8 +123,9 @@ const GivingsList = () => {
               <input
                 type="date"
                 id="category"
-                value={category}
-                onChange={handleCategoryChange}
+                value={dateFrom}
+              
+                onChange={handleDateFromChange}
                 className="border border-gray-300 rounded px-6 py-2"
               />
             </div>
@@ -119,20 +136,20 @@ const GivingsList = () => {
               <input
                 type="date"
                 id="category"
-                value={category}
-                onChange={handleCategoryChange}
+                value={dateTo}
+                onChange={handleDateToChange}
                 className="border border-gray-300 rounded px-6 py-2"
               />
             </div>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center ">
             <div className="flex flex-col items-center m-4">
               <label htmlFor="search" className="py-1 ">
                 Search
               </label>
               <input
                 type="text"
-                placeholder="Search by name or contact"
+                placeholder="Search by name"
                 id="search"
                 value={searchTerm}
                 onChange={handleSearchTermChange}
@@ -145,19 +162,21 @@ const GivingsList = () => {
       <div className="overflow-x-auto p-4 ">
         <div className="flex justify-end items-center ">
           <p className=" text-black px-4 py-2 bg-gray-400 shadow-sm rounded mx-2">
-            Reset filter
+            Add new
           </p>
-           <CSVLink filename={"givings_report.csv"} data={csvData} headers={headers}>
-          <p className=" text-white px-4 py-2 bg-black  rounded">
-
-            Download report
-          </p>
+          <CSVLink
+            filename={"givings_report.csv"}
+            data={csvData}
+            headers={headers}
+          >
+            <p className=" text-white px-4 py-2 bg-purple-800  rounded">
+              Download report
+            </p>
           </CSVLink>
         </div>
 
-
         <table className="min-w-full table-auto my-4">
-          <thead className="bg-purple-100/50  w-full">
+          <thead className="bg-gray-300  w-full">
             <tr className="text-black">
               <th className="px-4 ">Name</th>
               <th className="px-4 py-8">Contact</th>
@@ -178,7 +197,7 @@ const GivingsList = () => {
               </tr>
             ) : (
               filteredGivings.map((giving) => (
-                <tr key={giving.id} className="bg-gray-200">
+                <tr key={giving.id} className="bg-gray-200 text-center">
                   <td className="border px-4 py-2">{giving.name}</td>
                   <td className="border px-4 py-2">{giving.contact}</td>
                   <td className="border px-4 py-2">{giving.amount}</td>

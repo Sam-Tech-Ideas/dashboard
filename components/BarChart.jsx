@@ -28,11 +28,11 @@ const BarChart = () => {
 
   useEffect(() => {
     setChartData({
-      labels: ["Offering", "Tithes", "Pledges", "Donations"],
+      labels: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
       datasets: [
         {
           label: "Givings Ghc",
-          data: [18127, 22201, 19490, 17938],
+          data: [12, 19, 3, 5, 2 ],
           backgroundColor: [
             "rgb(53, 162, 235)",
             "rgb(255, 99, 132)",
