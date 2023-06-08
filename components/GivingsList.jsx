@@ -162,7 +162,7 @@ const GivingsList = () => {
       <div className="overflow-x-auto p-4 ">
         <div className="flex justify-end items-center ">
           <p className=" text-black px-4 py-2 bg-gray-400 shadow-sm rounded mx-2">
-            Add new
+            Record a giving
           </p>
           <CSVLink
             filename={"givings_report.csv"}
