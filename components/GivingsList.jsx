@@ -73,68 +73,127 @@ const GivingsList = () => {
   });
 
   return (
-    <div className="overflow-x-auto p-4">
-      {/* <div>
-        <label htmlFor="category">Category:</label>
-        <select id="category" value={category} onChange={handleCategoryChange}>
-          <option value="">All</option>
-          <option value="Card">Card</option>
-          <option value="Type 2">Type 2</option>
-          <option value="Type 3">Type 3</option>
-        </select>
-        <label htmlFor="search">Search:</label>
-        <input
-          type="text"
-          id="search"
-          value={searchTerm}
-          onChange={handleSearchTermChange}
-        />
-      </div> */}
-      <CSVLink filename={"givings_report.csv"} data={csvData} headers={headers}>
-        <Tooltip content="Download report" placement="right-end">
-          <button className="hover:text-blue-500">
-            <FaFileDownload size={30} />
-          </button>
-        </Tooltip>
-      </CSVLink>
+    <>
+      <div className="shadow-sm bg-white">
+        {/**date sort */}
+        <div className="flex justify-between items-center ">
+          <div className="flex items-center">
+            <div className="flex flex-col items-center m-4">
+              <label htmlFor="category" className="py-1 ">
+                Category
+              </label>
+              <select
+                id="category"
+                value={category}
+                onChange={handleCategoryChange}
+                className="border border-gray-300 rounded px-6 py-2"
+              >
+                <option value="" className="text-gray-300 p-4">
+                  Choose
+                </option>
+                <option value="Donation">Donation</option>
 
-      <table className="min-w-full table-auto">
-        <thead>
-          <tr>
-            <th className="px-4 py-2">Name</th>
-            <th className="px-4 py-2">Contact</th>
-            <th className="px-4 py-2">Amount (Ghc)</th>
-            <th className="px-4 py-2">Payment Type</th>
-            <th className="px-4 py-2">Payment Method</th>
-            <th className="px-4 py-2">Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {loading ? (
-            <tr>
-              <td colSpan="6" className="text-center">
-                <div className="flex justify-center  items-center space-x-2">
-                  <Loader />
-                </div>
-              </td>
+                <option value="Tithe">Tithe</option>
+                <option value="Offering">Offering</option>
+                <option value="Partnership">Pledge</option>
+
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div className="flex flex-col items-center m-4">
+              <label htmlFor="category" className="py-1 ">
+                Date from
+              </label>
+              <input
+                type="date"
+                id="category"
+                value={category}
+                onChange={handleCategoryChange}
+                className="border border-gray-300 rounded px-6 py-2"
+              />
+            </div>
+            <div className="flex flex-col items-center m-4">
+              <label htmlFor="category" className="py-1 ">
+                Date to
+              </label>
+              <input
+                type="date"
+                id="category"
+                value={category}
+                onChange={handleCategoryChange}
+                className="border border-gray-300 rounded px-6 py-2"
+              />
+            </div>
+          </div>
+          <div className="flex items-center">
+            <div className="flex flex-col items-center m-4">
+              <label htmlFor="search" className="py-1 ">
+                Search
+              </label>
+              <input
+                type="text"
+                placeholder="Search by name or contact"
+                id="search"
+                value={searchTerm}
+                onChange={handleSearchTermChange}
+                className="border border-gray-300 rounded px-6 py-2"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="overflow-x-auto p-4 ">
+        <div className="flex justify-end items-center ">
+          <p className=" text-black px-4 py-2 bg-gray-400 shadow-sm rounded mx-2">
+            Reset filter
+          </p>
+           <CSVLink filename={"givings_report.csv"} data={csvData} headers={headers}>
+          <p className=" text-white px-4 py-2 bg-black  rounded">
+
+            Download report
+          </p>
+          </CSVLink>
+        </div>
+
+
+        <table className="min-w-full table-auto my-4">
+          <thead className="bg-purple-100/50  w-full">
+            <tr className="text-black">
+              <th className="px-4 ">Name</th>
+              <th className="px-4 py-8">Contact</th>
+              <th className="px-4 py-4">Amount (Ghc)</th>
+              <th className="px-4 py-4">Payment Type</th>
+
+              <th className="px-4 py-4">Date</th>
             </tr>
-          ) : (
-            filteredGivings.map((giving) => (
-              <tr key={giving.id}>
-                <td className="border px-4 py-2">{giving.name}</td>
-                <td className="border px-4 py-2">{giving.contact}</td>
-                <td className="border px-4 py-2">{giving.amount}</td>
-                <td className="border px-4 py-2">{giving.giving_type}</td>
-                <td className="border px-4 py-2">{giving.paymentMethod}</td>
-                <td className="border px-4 py-2">
-                  {formatDate(giving.date_paid)}
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr>
+                <td colSpan="6" className="text-center">
+                  <div className="flex justify-center  items-center space-x-2">
+                    <Loader />
+                  </div>
                 </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-    </div>
+            ) : (
+              filteredGivings.map((giving) => (
+                <tr key={giving.id} className="bg-gray-200">
+                  <td className="border px-4 py-2">{giving.name}</td>
+                  <td className="border px-4 py-2">{giving.contact}</td>
+                  <td className="border px-4 py-2">{giving.amount}</td>
+                  <td className="border px-4 py-2">{giving.giving_type}</td>
+
+                  <td className="border px-4 py-2">
+                    {formatDate(giving.date_paid)}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 };
 
