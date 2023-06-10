@@ -178,8 +178,8 @@ const GivingsList = () => {
         <table className="min-w-full table-auto my-4">
           <thead className="bg-gray-300  w-full">
             <tr className="text-black">
-              <th className="px-4 ">Name</th>
-              <th className="px-4 py-8">Contact</th>
+      
+  
               <th className="px-4 py-4">Amount (Ghc)</th>
               <th className="px-4 py-4">Payment Type</th>
 
@@ -198,8 +198,7 @@ const GivingsList = () => {
             ) : (
               filteredGivings.map((giving) => (
                 <tr key={giving.id} className="bg-gray-200 text-center">
-                  <td className="border px-4 py-2">{giving.name}</td>
-                  <td className="border px-4 py-2">{giving.contact}</td>
+          
                   <td className="border px-4 py-2">{giving.amount}</td>
                   <td className="border px-4 py-2">{giving.giving_type}</td>
 

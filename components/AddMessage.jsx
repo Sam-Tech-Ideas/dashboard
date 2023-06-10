@@ -26,8 +26,8 @@ const AddMessage = () => {
     id: nanoid(),
     title: "",
     message: "",
-    recipient: [], //this is an array of users
-    read: [],
+    recipient: [""], //this is an array of users
+    read: [""],
     date: new Date(),          //this is the date the notification was created
   });
 useEffect(() => {
