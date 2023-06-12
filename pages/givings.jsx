@@ -1,65 +1,75 @@
-import React from 'react';
-import { FaFileDownload, FaShoppingBag } from 'react-icons/fa';
-import { BsThreeDotsVertical } from 'react-icons/bs';
+import React, { useState } from "react";
+import {
+  Tabs,
+  TabsHeader,
+  TabsBody,
+  Tab,
+  TabPanel,
+} from "@material-tailwind/react";
+import Overview from "@/components/Overview";
 
-import GivingsList from '@/components/GivingsList.jsx';
-import AddGivingCategory from '@/components/AddGivingCategory';
+const NewGiving = () => {
+  const [activeTab, setActiveTab] = useState("overview");
+  const data = [
+    {
+      label: "Overview",
+      value: "overview",
+      desc: <Overview />,
+    },
+    {
+      label: "Tithes",
+      value: "tithe",
+      desc: `All tithes`,
+    },
 
-const orders = () => {
+    {
+      label: "Partnership",
+      value: "partnership",
+      desc: `All partnership`,
+    },
+    {
+      label: "Offering",
+      value: "offering",
+      desc: `All offering`,
+    },
+
+    {
+      label: "Other",
+      value: "other",
+      desc: `All other givings`,
+    },
+  ];
   return (
-    <div className="bg-gray-100 min-h-screen">
-      <AddGivingCategory/>
-      <GivingsList />
-      {/* <div className='p-4'>
-        <div className='w-full m-auto p-4 border rounded-lg bg-white overflow-y-auto'>
-          <div className='my-3 p-2 grid md:grid-cols-4 sm:grid-cols-3 grid-cols-2 items-center justify-between cursor-pointer'>
-            <span>Order</span>
-            <span className='sm:text-left text-right'>Status</span>
-            <span className='hidden md:grid'>Last Order</span>
-            <span className='hidden sm:grid'>Method</span>
-          </div>
-          <ul>
-            {data.map((order, id) => (
-              <li
-                key={id}
-                className='bg-gray-50 hover:bg-gray-100 rounded-lg my-3 p-2 grid md:grid-cols-4 sm:grid-cols-3 grid-cols-2 items-center justify-between cursor-pointer'
-              >
-                <div className='flex'>
-                  <div className='bg-purple-100 p-3 rounded-lg'>
-                    <FaShoppingBag className='text-purple-800' />
-                  </div>
-                  <div className='pl-4'>
-                    <p className='text-gray-800 font-bold'>
-                      ${order.total.toLocaleString()}
-                    </p>
-                    <p className='text-gray-800 text-sm'>{order.name.first}</p>
-                  </div>
-                </div>
-                <p className='text-gray-600 sm:text-left text-right'>
-                  <span
-                    className={
-                      order.status == 'Processing'
-                        ? 'bg-green-200 p-2 rounded-lg'
-                        : order.status == 'Completed'
-                        ? 'bg-blue-200 p-2 rounded-lg'
-                        : 'bg-yellow-200 p-2 rounded-lg'
-                    }
-                  >
-                    {order.status}
-                  </span>
-                </p>
-                <p className='hidden md:flex'>{order.date}</p>
-                <div className='sm:flex hidden justify-between items-center'>
-                  <p>{order.method}</p>
-                  <BsThreeDotsVertical />
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div> */}
+    <div>
+      <Tabs value={activeTab} className="m-4">
+        <TabsHeader
+          className="rounded-none border-b border-blue-gray-50 bg-transparent p-0"
+          indicatorProps={{
+            className:
+              "bg-transparent border-b-2 border-blue-500 shadow-none rounded-none",
+          }}
+        >
+          {data.map(({ label, value }) => (
+            <Tab
+              key={value}
+              value={value}
+              onClick={() => setActiveTab(value)}
+              className={activeTab === value ? "text-blue-500" : ""}
+            >
+              {label}
+            </Tab>
+          ))}
+        </TabsHeader>
+        <TabsBody>
+          {data.map(({ value, desc }) => (
+            <TabPanel key={value} value={value}>
+              {desc}
+            </TabPanel>
+          ))}
+        </TabsBody>
+      </Tabs>
     </div>
   );
 };
 
-export default orders;
+export default NewGiving;
