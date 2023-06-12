@@ -14,6 +14,7 @@ import {
   MenuItem,
   MenuDivider,
 } from "@material-tailwind/react";
+
 const GivingsList = () => {
   const [givings, setGivings] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -60,6 +61,7 @@ const GivingsList = () => {
   const handleSearchTermChange = (event) => {
     setSearchTerm(event.target.value);
   };
+
   const handleDateFromChange = (event) => {
     setDateFrom(event.target.value);
   };
@@ -82,6 +84,7 @@ const GivingsList = () => {
       (selectedDateTo === null || givingDate <= selectedDateTo)
     );
   });
+
   const csvData = [
     ["Name", "Contact", "Amount", "Payment Type", "Payment Method", "Date"],
     ...filteredGivings.map((giving) => [
@@ -89,7 +92,6 @@ const GivingsList = () => {
       giving.contact,
       giving.amount,
       giving.giving_type,
-      giving.paymentMethod,
       formatDate(giving.date_paid),
     ]),
   ];
@@ -97,42 +99,17 @@ const GivingsList = () => {
   return (
     <>
       <div className="shadow-sm bg-white">
-        {/**date sort */}
-        {/* <div className="flex justify-between items-center ">
-          <div className="flex items-center">
-            <div className="flex flex-col items-center m-4">
-              <label htmlFor="category" className="py-1 ">
-                Category
-              </label>
-              <select
-                id="category"
-                value={category}
-                onChange={handleCategoryChange}
-                className="border border-gray-300 rounded px-6 py-2"
-              >
-                <option value="" className="text-gray-300 p-4">
-                  Choose
-                </option>
-                <option value="Donation">Donation</option>
-
-                <option value="tithe">Tithe</option>
-                <option value="Offering">Offering</option>
-                <option value="Partnership">Partnership</option>
-
-                <option value="Other">Other</option>
-              </select>
-            </div>
+        <div className="flex md:mt-8 justify-between items-center">
+          <div className="flex">
             <div className="flex flex-col items-center m-4">
               <label htmlFor="category" className="py-1 ">
                 Date from
               </label>
               <input
                 type="date"
-                id="category"
+                className="border-2 px-4 rounded-full "
                 value={dateFrom}
-
                 onChange={handleDateFromChange}
-                className="border border-gray-300 rounded px-6 py-2"
               />
             </div>
             <div className="flex flex-col items-center m-4">
@@ -141,105 +118,86 @@ const GivingsList = () => {
               </label>
               <input
                 type="date"
-                id="category"
+                className="border-2 px-4 rounded-full "
                 value={dateTo}
                 onChange={handleDateToChange}
-                className="border border-gray-300 rounded px-6 py-2"
               />
             </div>
           </div>
-          <div className="flex items-center ">
-            <div className="flex flex-col items-center m-4">
-              <label htmlFor="search" className="py-1 ">
-                Search
-              </label>
-              <input
-                type="text"
-                placeholder="Search by name"
-                id="search"
-                value={searchTerm}
-                onChange={handleSearchTermChange}
-                className="border border-gray-300 rounded px-6 py-2"
-              />
-            </div>
+          <div className="flex flex-row items-center m-4 pt-8">
+            <label htmlFor="" placeholder="" className="mx-1">
+              Search
+            </label>
+            <input
+              type="text"
+              id="category"
+              placeholder="Search a giver"
+              className="border-2 px-4 rounded-lg"
+              value={searchTerm}
+              onChange={handleSearchTermChange}
+            />
+          </div>
+          <div className=" flex  items-center  pt-8">
+            <CSVLink
+              filename={"givings_report.csv"}
+              data={csvData}
+              headers={headers}
+            >
+              <button className="bg-blue-500 text-white px-6 py-1 rounded-md hover:bg-blue-800 flex items-center">
+                Download report
+                <FaFileDownload className="ml-2" size={18} />
+              </button>
+            </CSVLink>
           </div>
         </div>
-      </div>
-      <div className="overflow-x-auto p-4 ">
-        <div className="flex justify-end items-center ">
-          <p className=" text-black px-4 py-2 bg-gray-400 shadow-sm rounded mx-2">
-            Record a giving
-          </p>
-          <CSVLink
-            filename={"givings_report.csv"}
-            data={csvData}
-            headers={headers}
-          >
-            <p className=" text-white px-4 py-2 bg-purple-800  rounded">
-              Download report
-            </p>
-          </CSVLink>
-        </div>
-        */}
 
         <div className="overflow-x-auto">
-          <table className="min-w-full table-auto">
-            <thead className="bg-gray-300">
-              <tr className="text-black">
-                <th className="px-4 py-4">No.</th>
-                <th className="px-4 py-4">Name</th>
-                <th className="px-4 py-4">Amount (Ghc)</th>
-                <th className="px-4 py-4">Payment Type</th>
-                <th className="px-4 py-4">Date</th>
-                <th className="px-4 py-4">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan="6" className="text-center">
-                    <div className="flex justify-center items-center space-x-2">
-                      <Loader />
-                    </div>
-                  </td>
+          {filteredGivings.length === 0 ? (
+            <p className="text-center text-gray-500 py-4">
+              No matching records found.
+            </p>
+          ) : (
+            <table className="min-w-full table-auto">
+              <thead className="bg-gray-300">
+                <tr className="text-black">
+                  <th className="px-4 py-4">No.</th>
+                  <th className="px-4 py-4">Name</th>
+                  <th className="px-4 py-4">Amount (Ghc)</th>
+                  <th className="px-4 py-4">Payment Type</th>
+                  <th className="px-4 py-4">Date</th>
                 </tr>
-              ) : (
-                filteredGivings.map((giving) => (
-                  <tr
-                    key={giving.id}
-                    className="bg-gray-200 text-center hover:bg-gray-100/50"
-                  >
-                    <td className="border px-4 py-2 ">
-                      {filteredGivings.indexOf(giving) + 1}
-                    </td>
-
-                    <td className="border px-4 py-2">Samuel Agyemang</td>
-                    <td className="border px-4 py-2">{giving.amount}</td>
-                    <td className="border px-4 py-2">{giving.giving_type}</td>
-                    <td className="border px-4 py-2">
-                      {formatDate(giving.date_paid)}
-                    </td>
-
-                    <td className="border px-4 py-2">
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan="6" className="text-center">
                       <div className="flex justify-center items-center space-x-2">
-                        <Menu>
-                          <MenuHandler>
-                            <Button className="bg-transparent shadow-none hover:shadow-none ">
-                              <AiOutlineMore className="text-black" />
-                            </Button>
-                          </MenuHandler>
-                          <MenuList>
-                            <MenuItem>Edit </MenuItem>
-                            <MenuItem>Delete</MenuItem>
-                          </MenuList>
-                        </Menu>
+                        <Loader />
                       </div>
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  filteredGivings.map((giving) => (
+                    <tr
+                      key={giving.id}
+                      className="bg-gray-200 text-center hover:bg-gray-100/50"
+                    >
+                      <td className="border px-4 py-2">
+                        {filteredGivings.indexOf(giving) + 1}
+                      </td>
+
+                      <td className="border px-4 py-2">Samuel Agyemang</td>
+                      <td className="border px-4 py-2">{giving.amount}</td>
+                      <td className="border px-4 py-2">{giving.giving_type}</td>
+                      <td className="border px-4 py-2">
+                        {formatDate(giving.date_paid)}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </>
