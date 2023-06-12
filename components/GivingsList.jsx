@@ -8,8 +8,12 @@ import { Button, Tooltip } from "@material-tailwind/react";
 import { MenuIcon } from "lucide-react";
 import { AiOutlineMore } from "react-icons/ai";
 import {
-  Menu, MenuHandler, MenuList, MenuItem, MenuDivider,
-} from '@material-tailwind/react'
+  Menu,
+  MenuHandler,
+  MenuList,
+  MenuItem,
+  MenuDivider,
+} from "@material-tailwind/react";
 const GivingsList = () => {
   const [givings, setGivings] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -17,7 +21,6 @@ const GivingsList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
-
 
   useEffect(() => {
     const fetchGivings = async () => {
@@ -57,14 +60,13 @@ const GivingsList = () => {
   const handleSearchTermChange = (event) => {
     setSearchTerm(event.target.value);
   };
-   const handleDateFromChange = (event) => {
-     setDateFrom(event.target.value);
-   };
+  const handleDateFromChange = (event) => {
+    setDateFrom(event.target.value);
+  };
 
-   const handleDateToChange = (event) => {
-     setDateTo(event.target.value);
-   };
-
+  const handleDateToChange = (event) => {
+    setDateTo(event.target.value);
+  };
 
   const filteredGivings = givings.filter((giving) => {
     const givingDate = giving.date_paid.toDate();
@@ -223,14 +225,12 @@ const GivingsList = () => {
                         <Menu>
                           <MenuHandler>
                             <Button className="bg-transparent shadow-none hover:shadow-none ">
-                        
-                              <AiOutlineMore  className="text-black"/>
+                              <AiOutlineMore className="text-black" />
                             </Button>
                           </MenuHandler>
                           <MenuList>
                             <MenuItem>Edit </MenuItem>
                             <MenuItem>Delete</MenuItem>
-                            <MenuItem>View Details</MenuItem>
                           </MenuList>
                         </Menu>
                       </div>
