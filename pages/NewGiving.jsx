@@ -6,6 +6,7 @@ import {
   Tab,
   TabPanel,
 } from "@material-tailwind/react";
+import Overview from '@/components/Overview';
  
 
 const NewGiving = () => {
@@ -14,7 +15,7 @@ const NewGiving = () => {
     {
       label: "Overview",
       value: "overview",
-      desc: `All givings`,
+      desc: <Overview/>,
     },
     {
       label: "Tithes",

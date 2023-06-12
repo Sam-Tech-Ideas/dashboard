@@ -2,7 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-
+body{
+  overflow-x: hidden;
+}
 
 .centered-spinner {
    display: flex;
@@ -96,6 +98,9 @@
     --radius: 0.5rem;
   }
 }
+
+
+
 /*  
 @layer base {
   * {

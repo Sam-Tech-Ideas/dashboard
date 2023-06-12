@@ -4,8 +4,12 @@ import React, { useEffect, useState } from "react";
 import Loader from "./Loader";
 import { CSVLink } from "react-csv";
 import { FaFileDownload } from "react-icons/fa";
-import { Tooltip } from "@material-tailwind/react";
-
+import { Button, Tooltip } from "@material-tailwind/react";
+import { MenuIcon } from "lucide-react";
+import { AiOutlineMore } from "react-icons/ai";
+import {
+  Menu, MenuHandler, MenuList, MenuItem, MenuDivider,
+} from '@material-tailwind/react'
 const GivingsList = () => {
   const [givings, setGivings] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -92,7 +96,7 @@ const GivingsList = () => {
     <>
       <div className="shadow-sm bg-white">
         {/**date sort */}
-        <div className="flex justify-between items-center ">
+        {/* <div className="flex justify-between items-center ">
           <div className="flex items-center">
             <div className="flex flex-col items-center m-4">
               <label htmlFor="category" className="py-1 ">
@@ -124,7 +128,7 @@ const GivingsList = () => {
                 type="date"
                 id="category"
                 value={dateFrom}
-              
+
                 onChange={handleDateFromChange}
                 className="border border-gray-300 rounded px-6 py-2"
               />
@@ -174,42 +178,69 @@ const GivingsList = () => {
             </p>
           </CSVLink>
         </div>
+        */}
 
-        <table className="min-w-full table-auto my-4">
-          <thead className="bg-gray-300  w-full">
-            <tr className="text-black">
-      
-  
-              <th className="px-4 py-4">Amount (Ghc)</th>
-              <th className="px-4 py-4">Payment Type</th>
-
-              <th className="px-4 py-4">Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan="6" className="text-center">
-                  <div className="flex justify-center  items-center space-x-2">
-                    <Loader />
-                  </div>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="min-w-full table-auto">
+            <thead className="bg-gray-300">
+              <tr className="text-black">
+                <th className="px-4 py-4">No.</th>
+                <th className="px-4 py-4">Name</th>
+                <th className="px-4 py-4">Amount (Ghc)</th>
+                <th className="px-4 py-4">Payment Type</th>
+                <th className="px-4 py-4">Date</th>
+                <th className="px-4 py-4">Action</th>
               </tr>
-            ) : (
-              filteredGivings.map((giving) => (
-                <tr key={giving.id} className="bg-gray-200 text-center">
-          
-                  <td className="border px-4 py-2">{giving.amount}</td>
-                  <td className="border px-4 py-2">{giving.giving_type}</td>
-
-                  <td className="border px-4 py-2">
-                    {formatDate(giving.date_paid)}
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan="6" className="text-center">
+                    <div className="flex justify-center items-center space-x-2">
+                      <Loader />
+                    </div>
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                filteredGivings.map((giving) => (
+                  <tr
+                    key={giving.id}
+                    className="bg-gray-200 text-center hover:bg-gray-100/50"
+                  >
+                    <td className="border px-4 py-2 ">
+                      {filteredGivings.indexOf(giving) + 1}
+                    </td>
+
+                    <td className="border px-4 py-2">Samuel Agyemang</td>
+                    <td className="border px-4 py-2">{giving.amount}</td>
+                    <td className="border px-4 py-2">{giving.giving_type}</td>
+                    <td className="border px-4 py-2">
+                      {formatDate(giving.date_paid)}
+                    </td>
+
+                    <td className="border px-4 py-2">
+                      <div className="flex justify-center items-center space-x-2">
+                        <Menu>
+                          <MenuHandler>
+                            <Button className="bg-transparent shadow-none hover:shadow-none ">
+                        
+                              <AiOutlineMore  className="text-black"/>
+                            </Button>
+                          </MenuHandler>
+                          <MenuList>
+                            <MenuItem>Edit </MenuItem>
+                            <MenuItem>Delete</MenuItem>
+                            <MenuItem>View Details</MenuItem>
+                          </MenuList>
+                        </Menu>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </>
   );
