@@ -183,7 +183,7 @@ const AddGivingCategory = () => {
                   <span>Create</span>
                 </button> */}
                 <button
-                  className="bg-blue-500 text-white px-6 py-1 rounded-md hover:bg-blue-800 flex items-center "
+                  className="bg-green-500 text-black px-6 py-1 rounded-md hover:bg-green-800 flex items-center "
                   onClick={handleOpen}
                 >
                   Create giving
