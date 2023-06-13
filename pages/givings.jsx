@@ -7,6 +7,7 @@ import {
   TabPanel,
 } from "@material-tailwind/react";
 import Overview from "@/components/Overview";
+import Tithe from "@/components/Tithe";
 
 const NewGiving = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -19,7 +20,7 @@ const NewGiving = () => {
     {
       label: "Tithes",
       value: "tithe",
-      desc: `All tithes`,
+      desc: <Tithe/>,
     },
 
     {

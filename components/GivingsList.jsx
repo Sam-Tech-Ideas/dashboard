@@ -14,6 +14,7 @@ import {
   MenuItem,
   MenuDivider,
 } from "@material-tailwind/react";
+import AddGivingCategory from "./AddGivingCategory";
 
 const GivingsList = () => {
   const [givings, setGivings] = useState([]);
@@ -54,9 +55,7 @@ const GivingsList = () => {
     { label: "Date", key: "date_paid" },
   ];
 
-  const handleCategoryChange = (event) => {
-    setCategory(event.target.value);
-  };
+ 
 
   const handleSearchTermChange = (event) => {
     setSearchTerm(event.target.value);
@@ -70,25 +69,23 @@ const GivingsList = () => {
     setDateTo(event.target.value);
   };
 
-  const filteredGivings = givings.filter((giving) => {
-    const givingDate = giving.date_paid.toDate();
-    const selectedDateFrom = dateFrom ? new Date(dateFrom) : null;
-    const selectedDateTo = dateTo ? new Date(dateTo) : null;
+   const filteredGivings = givings.filter((giving) => {
+     const givingDate = giving.date_paid.toDate();
+     const selectedDateFrom = dateFrom ? new Date(dateFrom) : null;
+     const selectedDateTo = dateTo ? new Date(dateTo) : null;
 
-    return (
-      (category === "" || giving.giving_type === category) &&
-      (searchTerm === "" ||
-        giving.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        giving.contact.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (selectedDateFrom === null || givingDate >= selectedDateFrom) &&
-      (selectedDateTo === null || givingDate <= selectedDateTo)
-    );
-  });
-
+     return (
+       (searchTerm === "" ||
+         giving.full_name.toLowerCase().includes(searchTerm.toLowerCase())) &&
+         
+       (selectedDateFrom === null || givingDate >= selectedDateFrom) &&
+       (selectedDateTo === null || givingDate <= selectedDateTo)
+     );
+   });
   const csvData = [
     ["Name", "Contact", "Amount", "Payment Type", "Payment Method", "Date"],
     ...filteredGivings.map((giving) => [
-      giving.name,
+      giving.full_name,
       giving.contact,
       giving.amount,
       giving.giving_type,
@@ -150,6 +147,10 @@ const GivingsList = () => {
             </CSVLink>
           </div>
         </div>
+        <div className=" flex  items-center  m-4">
+          <AddGivingCategory />
+
+        </div>
 
         <div className="overflow-x-auto">
           {filteredGivings.length === 0 ? (
@@ -186,7 +187,7 @@ const GivingsList = () => {
                         {filteredGivings.indexOf(giving) + 1}
                       </td>
 
-                      <td className="border px-4 py-2">Samuel Agyemang</td>
+                      <td className="border px-4 py-2">{giving.full_name}</td>
                       <td className="border px-4 py-2">{giving.amount}</td>
                       <td className="border px-4 py-2">{giving.giving_type}</td>
                       <td className="border px-4 py-2">
