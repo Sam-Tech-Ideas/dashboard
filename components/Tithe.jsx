@@ -4,6 +4,7 @@ import GivingsList from "./GivingsList";
 import { FaFileDownload } from "react-icons/fa";
 import { Card } from "@material-tailwind/react";
 import TitheDoughnut from "./TitheDoughnut";
+import TitheLists from "./TitheLists";
 //import TotalAmountLoadingAnimation from './LoadingNUmbers';
 
 const Tithe = () => {
@@ -36,24 +37,24 @@ const Tithe = () => {
               <ul>
                 <li className="flex flex-row justify-between">
                   <div className="flex flex-col m-8">
-                    <h1 className="text-2xl sm:text-5xl font-bold ">Ghc 400</h1>
-                    <p className=" text-lg ">Kumasi Crusade Tithes</p>
+                    <h1 className="text-lg sm:text-5xl font-bold ">Ghc 400</h1>
+                    <p className=" text-md ">Kumasi Crusade Tithes</p>
                   </div>
                   <div className="flex flex-col m-8">
-                    <h1 className="text-2xl sm:text-5xl font-bold ">
+                    <h1 className="text-lg sm:text-5xl font-bold ">
                       Ghc 4,000
                     </h1>
-                    <p className="  text-lg ">Total Easter Crusade Tithes</p>
+                    <p className="  text-md"> Easter Crusade Tithes</p>
                   </div>
                 </li>
 
                 <li className="flex flex-row justify-between">
                   <div className="flex flex-col m-8">
-                    <h1 className="text-2xl sm:text-5xl font-bold ">
+                    <h1 className="text-lg sm:text-5xl font-bold ">
                       Ghc 14,000
                     </h1>
 
-                    <p className="  text-lg "> Daily tithes</p>
+                    <p className="  text-md"> Daily tithes</p>
                   </div>
                 </li>
               </ul>
@@ -61,6 +62,7 @@ const Tithe = () => {
           </div>
 
           <div className="flex flex-col md:flex-row justify-around">
+        
             {/* <Card className="m-1">
               <div className="flex flex-col m-8">
                 <h1 className="text-2xl sm:text-5xl font-bold text-black">
@@ -81,9 +83,9 @@ const Tithe = () => {
         </div>
       </div>
 
-      {/* <Card className="border-gray-500">
-        <GivingsList />
-      </Card> */}
+      <Card className="border-gray-500">
+        <TitheLists />
+      </Card>
     </div>
   );
 };
