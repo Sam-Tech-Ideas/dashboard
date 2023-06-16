@@ -4,7 +4,7 @@ import GivingsList from "./GivingsList";
 import { FaFileDownload } from "react-icons/fa";
 import { Card } from "@material-tailwind/react";
 import TitheDoughnut from "./TitheDoughnut";
-import TitheLists from "./TitheLists";
+//import TitheLists from "./TitheLists";
 //import TotalAmountLoadingAnimation from './LoadingNUmbers';
 
 const Tithe = () => {
@@ -84,7 +84,7 @@ const Tithe = () => {
       </div>
 
       <Card className="border-gray-500">
-        <TitheLists />
+        
       </Card>
     </div>
   );
