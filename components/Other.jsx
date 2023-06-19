@@ -4,11 +4,10 @@ import GivingsList from "./GivingsList";
 import { FaFileDownload } from "react-icons/fa";
 import { Card } from "@material-tailwind/react";
 import TitheDoughnut from "./TitheDoughnut";
-import TitheLists from "./TitheLists";
 //import TitheLists from "./TitheLists";
 //import TotalAmountLoadingAnimation from './LoadingNUmbers';
 
-const Tithe = () => {
+const Other = () => {
   return (
     <div className="">
       {/**chart and amounts */}
@@ -63,7 +62,6 @@ const Tithe = () => {
           </div>
 
           <div className="flex flex-col md:flex-row justify-around">
-        
             {/* <Card className="m-1">
               <div className="flex flex-col m-8">
                 <h1 className="text-2xl sm:text-5xl font-bold text-black">
@@ -84,11 +82,9 @@ const Tithe = () => {
         </div>
       </div>
 
-      <Card className="border-gray-500">
-        <TitheLists/>
-      </Card>
+      <Card className="border-gray-500"></Card>
     </div>
   );
 };
 
-export default Tithe;
+export default Other;

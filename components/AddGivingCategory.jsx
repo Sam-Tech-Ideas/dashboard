@@ -26,7 +26,7 @@ const AddGivingCategory = () => {
     id: nanoid(),
     name: "",
     type: "",
-  }); 
+  });
 
   const handleOpen = () => setOpen(!open);
 
@@ -51,8 +51,6 @@ const AddGivingCategory = () => {
     }
   };
 
-  
-
   return (
     <div>
       <Fragment>
@@ -62,7 +60,7 @@ const AddGivingCategory = () => {
               className="bg-blue-500 text-white px-6 py-1 rounded-md hover:bg-blue-800 flex items-center"
               onClick={handleOpen}
             >
-              Create a giving
+              Record a giving
             </button>
           </div>
         </div>
@@ -199,9 +197,6 @@ const AddGivingCategory = () => {
 
 export default AddGivingCategory;
 
-
-
-
 // import React from "react";
 // //import { Button } from "@/components/ui/button";
 
@@ -230,7 +225,7 @@ export default AddGivingCategory;
 //     id: nanoid(),
 //     name: "",
 //     type: "",
-//   }); 
+//   });
 
 //   const handleOpen = () => setOpen(!open);
 
@@ -255,13 +250,11 @@ export default AddGivingCategory;
 //     }
 //   };
 
-  
-
 //   return (
 //     <div>
 //       <Fragment>
 //         <div className="flex justify-between px-4 pt-8">
-       
+
 //           <div className="flex items-center">
 //             <button className="bg-blue-500 text-white px-6 py-1 rounded-md hover:bg-blue-800 flex items-center" onClick={handleOpen}>
 //               Create a giving
@@ -334,4 +327,3 @@ export default AddGivingCategory;
 // };
 
 // export default AddGivingCategory;
-

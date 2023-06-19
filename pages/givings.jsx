@@ -8,6 +8,9 @@ import {
 } from "@material-tailwind/react";
 import Overview from "@/components/Overview";
 import Tithe from "@/components/Tithe";
+import Partnership from "@/components/Partnership";
+import Offering from "@/components/Offering";
+import Other from "@/components/Other";
 
 const NewGiving = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -20,24 +23,24 @@ const NewGiving = () => {
     {
       label: "Tithes",
       value: "tithe",
-      desc: <Tithe/>,
+      desc: <Tithe />,
     },
 
     {
       label: "Partnership",
       value: "partnership",
-      desc: `All partnership`,
+      desc: <Partnership />,
     },
     {
       label: "Offering",
       value: "offering",
-      desc: `All offering`,
+      desc: <Offering />,
     },
 
     {
       label: "Other",
       value: "other",
-      desc: `All other givings`,
+      desc:<Other/>,
     },
   ];
   return (
