@@ -20,9 +20,9 @@ const Other = () => {
             <Card className="m-1">
               <div className="flex flex-col m-8">
                 <h1 className="text-2xl sm:text-5xl font-bold text-black">
-                  Ghc 18,400
+                  Ghc 12,000
                 </h1>
-                <p className="text-black  text-lg ">Total Tithes</p>
+                <p className="text-black  text-lg ">Total Others</p>
               </div>
             </Card>
             <Card className="m-1">
@@ -36,26 +36,17 @@ const Other = () => {
                 Available Sub Categories
               </h1>
               <ul>
-                <li className="flex flex-row justify-between">
-                  <div className="flex flex-col m-8">
-                    <h1 className="text-lg sm:text-5xl font-bold ">Ghc 400</h1>
-                    <p className=" text-md ">Kumasi Crusade Tithes</p>
-                  </div>
-                  <div className="flex flex-col m-8">
-                    <h1 className="text-lg sm:text-5xl font-bold ">
-                      Ghc 4,000
-                    </h1>
-                    <p className="  text-md"> Easter Crusade Tithes</p>
-                  </div>
-                </li>
+               
 
                 <li className="flex flex-row justify-between">
                   <div className="flex flex-col m-8">
                     <h1 className="text-lg sm:text-5xl font-bold ">
-                      Ghc 14,000
+                      Ghc 6,000
                     </h1>
 
-                    <p className="  text-md"> Daily tithes</p>
+                    <p className="  text-md">
+                    Sick  and Needy 
+                    </p>
                   </div>
                 </li>
               </ul>

@@ -19,7 +19,7 @@ import { doc } from "firebase/firestore";
 import { nanoid } from "nanoid";
 import { FaFileDownload } from "react-icons/fa";
 
-const AddGivingCategory = () => {
+const AddGiving = () => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [category, setCategory] = useState({
@@ -60,7 +60,7 @@ const AddGivingCategory = () => {
               className="bg-blue-500 text-white px-6 py-1 rounded-md hover:bg-blue-800 flex items-center"
               onClick={handleOpen}
             >
-            Create Subcategory
+              Record a giving
             </button>
           </div>
         </div>
@@ -89,7 +89,7 @@ const AddGivingCategory = () => {
                   value={category.name}
                 />
               </div>
-              {/* <div className="m-2">
+              <div className="m-2">
                 <label htmlFor="">Giver's contact</label>
                 <input
                   type="text"
@@ -101,9 +101,9 @@ const AddGivingCategory = () => {
                   }
                   value={category.name}
                 />
-              </div> */}
+              </div>
 
-              {/* <div className="m-2">
+              <div className="m-2">
                 <label htmlFor="">category type</label>
                 <select
                   className="border-2 border-gray-300 p-2 rounded-lg w-full"
@@ -124,7 +124,7 @@ const AddGivingCategory = () => {
                   <option value="offering">Offering</option>
                   <option value="others">Others</option>
                 </select>
-              </div> */}
+              </div>
               <div className="m-2">
                 <label htmlFor="">subcategory type</label>
                 <select
@@ -147,9 +147,23 @@ const AddGivingCategory = () => {
                   <option value="others">Others</option>
                 </select>
               </div>
-            
+              <div className="m-2">
+                <label htmlFor="">
+                  Amount <span className="text-gray-400">(Ghc)</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Category name"
+                  className="border-2 border-gray-300 p-2 rounded-lg w-full"
+                  required
+                  onChange={(e) =>
+                    setCategory({ ...category, name: e.target.value })
+                  }
+                  value={category.name}
+                />
+              </div>
               {/**date */}
-              {/* <div className="m-2">
+              <div className="m-2">
                 <label htmlFor="">Date</label>
                 <input
                   type="date"
@@ -157,7 +171,7 @@ const AddGivingCategory = () => {
                   className="border-2 border-gray-300 p-2 rounded-lg w-full"
                   required
                 />
-              </div> */}
+              </div>
 
               <div className="flex justify-between m-4">
                 {/* <button
@@ -167,7 +181,7 @@ const AddGivingCategory = () => {
                   <span>Create</span>
                 </button> */}
                 <button
-                  className="bg-green-500 text-white px-8 py-1 rounded-md hover:bg-green-800 flex items-center "
+                  className="bg-green-500 text-black px-6 py-1 rounded-md hover:bg-green-800 flex items-center "
                   onClick={handleOpen}
                 >
                   Create giving
@@ -181,7 +195,7 @@ const AddGivingCategory = () => {
   );
 };
 
-export default AddGivingCategory;
+export default AddGiving;
 
 // import React from "react";
 // //import { Button } from "@/components/ui/button";

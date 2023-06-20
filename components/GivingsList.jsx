@@ -15,6 +15,7 @@ import {
   MenuDivider,
 } from "@material-tailwind/react";
 import AddGivingCategory from "./AddGivingCategory";
+import AddGiving from "./AddGiving";
 
 const GivingsList = () => {
   const [givings, setGivings] = useState([]);
@@ -149,7 +150,7 @@ const GivingsList = () => {
           </div>
         </div>
         <div className=" flex  items-center  m-4">
-          <AddGivingCategory />
+          <AddGiving/>
 
         </div>
 
