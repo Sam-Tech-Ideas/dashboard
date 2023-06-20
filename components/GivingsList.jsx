@@ -32,6 +32,7 @@ const GivingsList = () => {
         const givingsData = querySnapshot.docs.map((doc) => doc.data());
         setGivings(givingsData);
         setLoading(false);
+        console.log(givingsData);
       } catch (error) {
         console.log(error);
         setLoading(false);

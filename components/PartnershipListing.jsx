@@ -16,7 +16,7 @@ import {
 } from "@material-tailwind/react";
 import AddGivingCategory from "./AddGivingCategory";
 
-const TitheList = () => {
+const PartnershipListing = () => {
   const [givings, setGivings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [category, setCategory] = useState("");
@@ -24,31 +24,28 @@ const TitheList = () => {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
 
-   useEffect(() => {
-     const fetchGivings = async () => {
-       setLoading(true);
+  useEffect(() => {
+    const fetchGivings = async () => {
+      setLoading(true);
 
-       try {
-         const q = query(
-           collection(db, "givings"),
-           where("giving_type", "==", "Tithes")
-         );
-         const querySnapshot = await getDocs(q);
-         const givingsData = querySnapshot.docs.map((doc) => doc.data());
-         setGivings(givingsData);
-         setLoading(false);
-          console.log(givingsData);
-       } catch (error) {
-         console.log(error);
-         setLoading(false);
-       }
-     };
+      try {
+        const q = query(
+          collection(db, "givings"),
+          where("giving_type", "==", "Partnership")
+        );
+        const querySnapshot = await getDocs(q);
+        const givingsData = querySnapshot.docs.map((doc) => doc.data());
+        setGivings(givingsData);
+        setLoading(false);
+        console.log(givingsData);
+      } catch (error) {
+        console.log(error);
+        setLoading(false);
+      }
+    };
 
-     fetchGivings();
-   }, []);
-
-
-  
+    fetchGivings();
+  }, []);
 
   const formatDate = (timestamp) => {
     const date = timestamp.toDate();
@@ -210,4 +207,4 @@ const TitheList = () => {
   );
 };
 
-export default TitheList;
+export default PartnershipListing

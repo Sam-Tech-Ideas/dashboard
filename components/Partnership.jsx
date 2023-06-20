@@ -4,6 +4,7 @@ import GivingsList from "./GivingsList";
 import { FaFileDownload } from "react-icons/fa";
 import { Card } from "@material-tailwind/react";
 import TitheDoughnut from "./TitheDoughnut";
+import PartnershipListing from "./PartnershipListing";
 //import TitheLists from "./TitheLists";
 //import TotalAmountLoadingAnimation from './LoadingNUmbers';
 
@@ -78,7 +79,9 @@ const Partnership = () => {
         </div>
       </div>
 
-      <Card className="border-gray-500"></Card>
+      <Card className="border-gray-500">
+        <PartnershipListing/>
+      </Card>
     </div>
   );
 };
