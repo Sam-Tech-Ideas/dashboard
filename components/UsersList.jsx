@@ -17,6 +17,7 @@ import {
   DialogHeader,
   Tooltip,
 } from "@material-tailwind/react";
+import Link from "next/link";
 
 const UsersList = () => {
   const [users, setUsers] = useState([]);
@@ -34,6 +35,7 @@ const UsersList = () => {
         const usersData = querySnapshot.docs.map((doc) => doc.data());
         setUsers(usersData);
         setLoading(false);
+        console.log(usersData);
       } catch (error) {
         console.log(error);
         setLoading(false);
@@ -76,6 +78,7 @@ const UsersList = () => {
                 Role
               </label>
               <select
+                placeholder="Select Role"
                 name=""
                 id=""
                 className="p-2 w-full "
@@ -84,7 +87,6 @@ const UsersList = () => {
                   setUser({ ...user, profileType: e.target.value })
                 }
               >
-                <option value="">Select Role</option>
                 <option value="user">User</option>
                 <option value="admin">Admin</option>
               </select>
@@ -99,7 +101,7 @@ const UsersList = () => {
           </form>
         </DialogBody>
       </Dialog>
-      <table className="min-w-full table-auto">
+      {/* <table className="min-w-full table-auto">
         <thead>
           <tr>
             <th className="px-4 py-2">Name</th>
@@ -120,35 +122,31 @@ const UsersList = () => {
             </tr>
           ) : users && users.length > 0 ? (
             users.map((giving) => (
-              <tr key={giving.id} className="text-center">
-                <td className="border-2 px-4 py-2">{giving.fullName}</td>
-                <td className="border-2 px-4 py-2">{giving.email}</td>
-                <td className="border-2 px-4 py-2">{giving.phoneNumber}</td>
-                <td className="border-2 px-4 py-2">{giving.profileType}</td>
-                <td className="border-2 px-4 py-2">
-                  <Tooltip
-                    content="Assign Role"
-                    placement="top"
-                    color="lightBlue"
-                  >
-                    <div className="flex  ">
-                      {/* <FaTrashAlt
-                      size={20}
-                      className="text-red-500 cursor-pointer mx-4"
-                      onClick={() => deleteUser(giving.id, giving.photo)}
-                    /> */}
-
-                      <FaEdit
-                        size={20}
-                        className="text-green-500 cursor-pointer"
-                        onClick={() => {
-                          handleOpen();
-                          setUser(giving);
-                        }}
-                      />
-                    </div>
-                  </Tooltip>
-                </td>
+              <tr key={giving.id} className="text-center hover:bg-gray-300">
+                <Link href={`/users/${giving.id}`} key={giving.id}>
+                  <td className="border-2 px-4 py-2">{giving.fullName}</td>
+                  <td className="border-2 px-4 py-2">{giving.email}</td>
+                  <td className="border-2 px-4 py-2">{giving.phoneNumber}</td>
+                  <td className="border-2 px-4 py-2">{giving.profileType}</td>
+                  <td className="border-2 px-4 py-2">
+                    <Tooltip
+                      content="Assign Role"
+                      placement="top"
+                      color="lightBlue"
+                    >
+                      <div className="flex  ">
+                        <FaEdit
+                          size={20}
+                          className="text-green-500 cursor-pointer"
+                          onClick={() => {
+                            handleOpen();
+                            setUser(giving);
+                          }}
+                        />
+                      </div>
+                    </Tooltip>
+                  </td>
+                </Link>
               </tr>
             ))
           ) : (
@@ -159,7 +157,13 @@ const UsersList = () => {
             </tr>
           )}
         </tbody>
-      </table>
+      </table> */}
+
+      
+
+
+
+
     </div>
   );
 };
