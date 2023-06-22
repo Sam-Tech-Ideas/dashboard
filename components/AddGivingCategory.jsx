@@ -73,14 +73,16 @@ const AddGivingCategory = () => {
             unmount: { scale: 0.9, y: -100 },
           }}
         >
-          <DialogHeader>Add Giving</DialogHeader>
+          <DialogHeader>Create Giving Subcategory</DialogHeader>
           <DialogBody divider>
             <form onSubmit={handleCreateCategory}>
               <div className="m-2">
-                <label htmlFor="">Giver's name</label>
+                <label htmlFor="">
+                   Subcategory title
+                </label>
                 <input
                   type="text"
-                  placeholder="Category name"
+                  placeholder="Category title"
                   className="border-2 border-gray-300 p-2 rounded-lg w-full"
                   required
                   onChange={(e) =>
