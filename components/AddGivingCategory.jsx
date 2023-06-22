@@ -137,10 +137,8 @@ const AddGivingCategory = () => {
                     setCategory({ ...category, type: e.target.value })
                   }
                 >
-                  <option value="">Select category type</option>
-                  <option value="donation" className="">
-                    Donation
-                  </option>
+                  <option>Select category type</option>
+                 
 
                   <option value="tithe">Tithe</option>
 
