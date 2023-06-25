@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 //import { Button } from "@/components/ui/button";
+import { onSnapshot } from "firebase/firestore";
 
 import { Fragment, useState } from "react";
 import {
@@ -26,55 +27,51 @@ const AddMessage = () => {
     id: nanoid(),
     title: "",
     message: "",
-    recipient: [""], //this is an array of users
-    read: [""],
+    recipient: [], //this is an array of users
+    read: [],
     date: new Date(),          //this is the date the notification was created
   });
 useEffect(() => {
-  const fetchData = async () => {
-    const querySnapshot = await getDocs(collection(db, "devices"));
+  
+  const unsubscribe = onSnapshot(collection(db, "devices"), (snapshot) => {
     const tokens = [];
-
-    querySnapshot.forEach((doc) => {
+    snapshot.forEach((doc) => {
       const specificField = doc.data().fcmToken;
       tokens.push(specificField);
     });
-
     setData(tokens);
-  };
+  });
 
-  fetchData();
+  return () => unsubscribe(); // Cleanup the listener on unmount
 }, []);
 
 
    console.log(data);
 
 
-  const handleAddNotification = async (e) => {
-    e.preventDefault();
+ const handleAddNotification = async (e) => {
+   e.preventDefault();
 
-    try {
-      const docRef = doc(db, "notifications", notification.id);
+try {
+  const docRef = doc(db, "notifications", notification.id);
 
-      const notificationData = {
-        id: notification.id,
-        title: notification.title,
-        message: notification.message,
-        recipient: [...notification.recipient, ...data], // Add the fetched data to the recipient array
-        read: notification.read,
-        date: notification.date,
-      };
-
-      await setDoc(docRef, notificationData);
-      toast.success("Notification created successfully");
-      handleOpen();
-
-      // ...
-    } catch (error) {
-      toast.error(error.message);
-    }
+  const notificationData = {
+    id: notification.id,
+    title: notification.title,
+    message: notification.message,
+    recipients: [...(notification.recipients || []), ...data], // Add the fetched data to the recipients array
+    read: [...(notification.read || []), ...data.map(() => "")], // Initialize read status for each recipient
+    date: notification.date,
   };
 
+  await setDoc(docRef, notificationData);
+  toast.success("Notification created successfully");
+  handleOpen();
+} catch (error) {
+  toast.error(error.message);
+  console.log(error.message);
+}
+ }
 
   return (
     <div>
@@ -83,7 +80,7 @@ useEffect(() => {
           <h2 className="font-bold text-2xl">Notifications</h2>
           <div className="flex items-center">
             <button
-              className="bg-purple-800 text-white px-4 py-2 rounded-lg m-2"
+              className="bg-blue-500 text-white px-4 py-2 rounded-md m-2"
               onClick={handleOpen}
             >
               <span>Send a message</span>

@@ -9,35 +9,28 @@ const Customers = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
-       
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setLoading(true);
+      try {
+        const querySnapshot = await getDocs(collection(db, "users"));
+        const usersData = querySnapshot.docs.map((doc) => doc.data());
+        setUsers(usersData);
+        setLoading(false);
+        console.log(usersData);
+      } catch (error) {
+        console.log(error);
+        setLoading(false);
+      }
+    };
 
+    fetchUsers();
+  }, []);
 
+  const filteredUsers = users.filter((user) =>
+    user.fullName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-   useEffect(() => {
-     const fetchUsers = async () => {
-       setLoading(true);
-       try {
-         const querySnapshot = await getDocs(collection(db, "users"));
-         const usersData = querySnapshot.docs.map((doc) => doc.data());
-         setUsers(usersData);
-         setLoading(false);
-         console.log(usersData);
-       } catch (error) {
-         console.log(error);
-         setLoading(false);
-       }
-     };
-
-     fetchUsers();
-   }, []);
-
-   const filteredUsers = users.filter((user) =>
-     user.fullName.toLowerCase().includes(searchQuery.toLowerCase())
-   );
-
-   
-    
- 
   return (
     <div className="">
       <div className="m-8 flex items-center justify-between">
@@ -162,9 +155,8 @@ const Customers = () => {
 
 export default Customers;
 
-
-
-  {/* <tbody>
+{
+  /* <tbody>
             {loading ? (
               <tr>
                 <td colSpan="4" className="p-4">
@@ -217,4 +209,5 @@ export default Customers;
                 </td>
               </tr>
             )}
-          </tbody> */}
+          </tbody> */
+}

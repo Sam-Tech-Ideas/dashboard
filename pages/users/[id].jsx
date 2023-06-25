@@ -1,4 +1,6 @@
+
 import React, { useEffect, useState } from "react";
+
 import {
   collection,
   doc,
@@ -10,39 +12,65 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from "@/firebase/config";
-import { Card, Typography } from "@material-tailwind/react";
 import { FaEdit, FaPencilAlt } from "react-icons/fa";
 import { useRouter } from "next/router";
+import BarChart from "@/components/BarChart";
+import Loader from "@/components/Loader";
+import { toast } from "react-hot-toast";
+import { Fragment } from "react";
+import {
+  Dialog,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+  Select,
+  Option,
+  Input,
+  Card,
+} from "@material-tailwind/react";
+import { Bar } from "react-chartjs-2";
 
 const UserDetail = () => {
   const [user, setUser] = useState(null);
-  const [name, setName] = useState("");
   const [givings, setGivings] = useState([]);
-
-  const router = useRouter();
-  const { id } = router.query;
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+    const [selectedRole, setSelectedRole] = useState("");
 
   const [open, setOpen] = useState(false);
 
-  const handleOpen = () => setOpen(!open);
 
-  console.log(id);
+  const handleOpen = () => setOpen(!open);
+  const router = useRouter();
+  const { id } = router.query;
 
   useEffect(() => {
-    // const docRef = doc(db, "users", id);
+    setLoading(true);
 
-    // const unsubscribe = onSnapshot(docRef, (docSnap) => {
-    //   if (docSnap.exists()) {
-    //     console.log("Document data:", docSnap.data());
-    //     setUser(docSnap.data());
-    //   } else {
-    //     // doc.data() will be undefined in this case
-    //     console.log("No such document!");
-    //   }
-    // });
+    try {
+      const docRef = doc(db, "users", id);
 
-    // return () => unsubscribe();
+      const unsubscribe = onSnapshot(docRef, (docSnap) => {
+        if (docSnap.exists()) {
+          console.log("Document data:", docSnap.data());
+          setUser(docSnap.data());
+          setLoading(false);
+        } else {
+          // doc.data() will be undefined in this case
+          console.log("No such document!");
 
+          setLoading(false);
+          toast.error(
+            "Unable to provide data check your internet connection and try again"
+          );
+        }
+      });
+    } catch (error) {
+      setLoading(false);
+    }
+  }, [id]);
+
+  useEffect(() => {
     const fetchGivings = async () => {
       try {
         const givingsColRef = collection(db, "givings");
@@ -64,179 +92,210 @@ const UserDetail = () => {
     }
   }, [id]);
 
-  useEffect(() => {
-    const docRef = doc(db, "users", id);
+  const editHandler = async (e) => {
+    e.preventDefault();
+    console.log("Edit");
+    try {
+      const docRef = doc(db, "users", user.id);
+      const userData = {
+        id: user.id,
+        fullName: user.fullName,
+        photo: user.photo,
+        username: user.username,
+         dateOfBirth:user.dateOfBirth,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        profileType: user.profileType,
+      };
+      await setDoc(docRef, userData);
+      toast.success("User updated successfully");
+      handleOpen();
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-    const unsubscribe = onSnapshot(docRef, (docSnap) => {
-      if (docSnap.exists()) {
-        console.log("Document data:", docSnap.data());
-        setUser(docSnap.data());
-      } else {
-        // doc.data() will be undefined in this case
-        console.log("No such document!");
+  const getWeekDay = (date) => {
+    const weekdays = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+    const day = new Date(date).getDay();
+    return weekdays[day];
+  };
+
+  const groupGivingsByDay = () => {
+    const weekdays = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+
+    const getRandomColor = () => {
+      const letters = "0123456789ABCDEF";
+      let color = "#";
+      for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
       }
+      return color;
+    };
+
+    const groupedGivings = weekdays.reduce((accumulator, dayOfWeek) => {
+      accumulator[dayOfWeek] = {
+        amount: 0,
+        color: getRandomColor(),
+      };
+      return accumulator;
+    }, {});
+
+    givings.forEach((giving) => {
+      const dayOfWeek = getWeekDay(giving.date_paid.toDate());
+      groupedGivings[dayOfWeek].amount += giving.amount;
     });
 
-    return () => unsubscribe();
+    return Object.entries(groupedGivings).map(([dayOfWeek, data]) => ({
+      dayOfWeek,
+      amount: data.amount,
+      color: data.color,
+    }));
+  };
 
-    if (id) {
-      fetchGivings();
-    }
-  }, [id]);
-
-  const TABLE_HEAD = ["Giving Type", "Amount", "Date"];
-
-  const TABLE_ROWS = [
-    ["Tithe", "1000", "12/12/2021"],
-    ["Offering", "1000", "12/12/2021"],
-  ];
+  const givingsData = {
+    labels: groupGivingsByDay().map((giving) => giving.dayOfWeek),
+    datasets: [
+      {
+        label: "Givings",
+        data: groupGivingsByDay().map((giving) => giving.amount),
+        backgroundColor: groupGivingsByDay().map((giving) => giving.color),
+        borderColor: "rgba(54, 162, 235, 1)",
+        borderWidth: 1,
+      },
+    ],
+  };
 
   return (
     <div>
+      <div className="p-8 ">{/* Other code... */}</div>
       <div className="p-8">
-        <div class="px-4 sm:px-0 ">
-          <h3 class="text-3xl font-semibold leading-7 text-gray-900">
-            User's personal information
-          </h3>
-          <p class="mt-1 max-w-2xl text-sm leading-6 text-red-500">
-            Only user's role can be updated
-          </p>
+        <div className="flex justify-between">
+          <h1 className="text-2xl font-semibold text-gray-900">
+            User's Personal Information
+          </h1>
+          <button
+            onClick={handleOpen}
+            className="flex items-center px-4 py-2 space-x-2 text-sm font-medium text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <FaPencilAlt className="w-5 h-5" />
+            <span>Edit</span>
+          </button>
         </div>
-        <div class="mt-6 border-t border-gray-100">
-          {user && (
-            <dl class="divide-y divide-gray-100">
-              <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                <dt class="text-sm font-medium leading-6 text-gray-900">
-                  Full name
-                </dt>
-                <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                  {user.fullName}
-                </dd>
-              </div>
-              <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                <dt class="text-sm font-medium leading-6 text-gray-900">
-                  User's role
-                </dt>
-                <dd class="mt-1 text-sm flex items-center  leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                  {user.profileType}
-                  <span className="px-4 hover:cursor-pointer">
-                    <FaPencilAlt color="green" size={19} />
-                  </span>
-                </dd>
-              </div>
-              <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                <dt class="text-sm font-medium leading-6 text-gray-900">
-                  Email address
-                </dt>
-                <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                  {user.email}
-                </dd>
-              </div>
 
-              <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                <dt class="text-sm font-medium leading-6 text-gray-900">
-                  Date of birth
+        <div className="mt-4">
+          <div className="overflow-hidden bg-white shadow sm:rounded-md">
+            {/* Other code... */}
+          </div>
+        </div>
+      </div>
+      {/**user data */}
+      <div class="mt-6 border-t border-gray-100 p-8">
+        {loading && <Loader />}
+        {error && (
+          <div className="p-8">
+            <p className="text-red-500">Error: Unable to fetch user data</p>
+          </div>
+        )}
+        {user && (
+          <dl class="divide-y divide-gray-100">
+            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+              <dt class="text-sm font-medium leading-6 text-gray-900">
+                Full name
+              </dt>
+              <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                {user.fullName}
+              </dd>
+            </div>
+            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+              <dt class="text-sm font-medium leading-6 text-gray-900">
+                User's role
+              </dt>
+              <dd class="mt-1 text-sm flex items-center  leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                {user.profileType}
+              </dd>
+            </div>
+            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+              <dt class="text-sm font-medium leading-6 text-gray-900">
+                Email address
+              </dt>
+              <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                {user.email}
+              </dd>
+            </div>
+
+            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+              <dt class="text-sm font-medium leading-6 text-gray-900">
+                Date of birth
+              </dt>
+              <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                {user.dateOfBirth &&
+                  new Date(
+                    user.dateOfBirth.seconds * 1000
+                  ).toLocaleDateString()}
+              </dd>
+            </div>
+            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+              <dt class="text-sm font-medium leading-6 text-gray-900">
+                Contact
+              </dt>
+              <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                {user.phoneNumber}
+              </dd>
+            </div>
+            {/* <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+              <dt class="text-sm font-medium leading-6 text-gray-900">Group</dt>
+              <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                No Group available
+              </dd>
+            </div> */}
+          </dl>
+        )}
+      </div>
+
+      {/**users giving in barchart */}
+      {givings.length > 0 && (
+        <div className="p-8">
+          <div className="px-4 sm:px-0">
+            <h3 className="text-3xl font-semibold leading-7 text-gray-900">
+              User's Giving History
+            </h3>
+          </div>
+
+          <div className="mt-6 border-t border-gray-100">
+            <dl className="divide-y divide-gray-100">
+              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt className="text-xl font-medium leading-6 text-gray-900">
+                  Total Givings
                 </dt>
-                <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                  {user.dateOfBirth &&
-                    new Date(
-                      user.dateOfBirth.seconds * 1000
-                    ).toLocaleDateString()}
-                </dd>
-              </div>
-              <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                <dt class="text-sm font-medium leading-6 text-gray-900">
-                  Contact
-                </dt>
-                <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                  {user.phoneNumber}
-                </dd>
-              </div>
-              <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                <dt class="text-sm font-medium leading-6 text-gray-900">
-                  Group
-                </dt>
-                <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                  No Group available
+                <dd className="mt-1 text-xl leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                  Gh{givings.reduce((a, b) => a + b.amount, 0)}
                 </dd>
               </div>
             </dl>
-          )}
+          </div>
+
+          <div className="mt-6">
+            <Bar data={givingsData} />
+          </div>
         </div>
-      </div>
-
-      {/* <h1 className="p-8">
-        <Typography variant="h5" className="mb-6">
-          User's Giving History
-        </Typography>
-        <p>
-          Total Givings: <span className="text-green-500">Ghc 1000</span>
-        </p>
-      </h1> */}
-
-      {/* <Card className="overflow-scroll h-full w-full">
-        <table className="w-full min-w-max table-auto text-left">
-          <thead>
-            <tr>
-              {TABLE_HEAD.map((head) => (
-                <th
-                  key={head}
-                  className="border-b border-blue-gray-100 bg-blue-gray-50 p-4"
-                >
-                  <Typography
-                    variant="small"
-                    color="blue-gray"
-                    className="font-normal leading-none opacity-70"
-                  >
-                    {head}
-                  </Typography>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {TABLE_ROWS.map(({ giving_type, amount, date_paid }, index) => {
-              const isLast = index === TABLE_ROWS.length - 1;
-              const classes = isLast
-                ? "p-4"
-                : "p-4 border-b border-blue-gray-50";
-
-              return (
-                <tr key={giving_type}>
-                  
-                  <td className={classes}>
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-normal"
-                    >
-                      {giving_type}
-                    </Typography>
-                  </td>
-                  <td className={classes}>
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-normal"
-                    >
-                      {amount}
-                    </Typography>
-                  </td>
-                  <td className={classes}>
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-normal"
-                    >
-                      {date_paid}
-                    </Typography>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </Card> */}
+      )}
 
       {givings.length > 0 && (
         <div className="p-8">
@@ -273,6 +332,87 @@ const UserDetail = () => {
           </div>
         </div>
       )}
+      {/* Render the modal component */}
+      <Dialog open={open} handler={handleOpen}>
+        <DialogHeader>Edit User</DialogHeader>
+        <DialogBody divider>
+          <form onSubmit={editHandler}>
+            <div className="grid grid-cols-1 gap-6 mt-4">
+              <label className="block">
+                <span className="text-gray-700">Full Name</span>
+                <Input
+                  type="text"
+                  name="fullName"
+                  id="fullName"
+                  required
+                  value={user ? user.fullName : ""}
+                  onChange={(e) =>
+                    setUser({ ...user, fullName: e.target.value })
+                  }
+                  className="block w-full mt-1 form-input py-3 border-2 rounded "
+                />
+              </label>
+              <label className="block">
+                <span className="text-gray-700">Email</span>
+                <Input
+                  type="email"
+                  name="email"
+                  id="email"
+                  required
+                  value={user ? user.email : ""}
+                  onChange={(e) => setUser({ ...user, email: e.target.value })}
+                  className="block w-full mt-1 form-input"
+                />
+              </label>
+
+              <label className="block">
+                <span className="text-gray-700">Phone Number</span>
+                <Input
+                  type="text"
+                  name="phoneNumber"
+                  id="phoneNumber"
+                  required
+                  value={user ? user.phoneNumber : ""}
+                  onChange={(e) =>
+                    setUser({ ...user, phoneNumber: e.target.value })
+                  }
+                  className="block w-full mt-1 form-input"
+                />
+              </label>
+              <label className="block">
+                <span className="text-gray-700">Role</span>
+
+                <Select
+                  value={user ? user.profileType : ""}
+                  onChange={(e) =>
+                    setUser({ ...user, profileType: e.target.value })
+                  }
+                  className="block w-full mt-1 form-select"
+                >
+                  <option value="admin">Admin</option>
+                  <option value="user">User</option>
+                </Select>
+              </label>
+            </div>
+
+            <div className="flex justify-end mt-6">
+              <button
+                type="button"
+                onClick={handleOpen}
+                className="px-4 py-2 text-sm font-medium text-gray-700 transition-colors duration-150 bg-gray-200 border border-transparent rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 ml-4 text-sm font-medium text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </DialogBody>
+      </Dialog>
     </div>
   );
 };

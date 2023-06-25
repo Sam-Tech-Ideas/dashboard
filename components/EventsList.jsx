@@ -64,7 +64,7 @@ const EventsList = () => {
     <>
       <AddEvent />
       <div className="overflow-x-auto p-4">
-        <table className="min-w-full table-auto">
+        {/* <table className="min-w-full table-auto">
           <thead>
             <tr>
               <th className="px-4 py-2">Title</th>
@@ -109,7 +109,7 @@ const EventsList = () => {
               ))
             )}
           </tbody>
-        </table>
+        </table> */}
       </div>
     </>
   );

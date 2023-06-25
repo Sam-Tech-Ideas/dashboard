@@ -1,89 +1,108 @@
-import React from "react";
-import DoughnutChart from "./Doghnout";
-import GivingsList from "./GivingsList";
-import { FaFileDownload } from "react-icons/fa";
+import React, { useEffect, useState } from "react";
+import { collection, getDocs, onSnapshot, query, where } from "firebase/firestore";
+import { db } from "@/firebase/config";
 import { Card } from "@material-tailwind/react";
-import TitheDoughnut from "./TitheDoughnut";
+import TitheList from "./TitheLists";
+import OfferingList from "./OfferingList";
+import OtherList from "./OtherList";
 import PartnershipListing from "./PartnershipListing";
-//import TitheLists from "./TitheLists";
-//import TotalAmountLoadingAnimation from './LoadingNUmbers';
 
-const Partnership = () => {
+const Other = () => {
+  const [totalTithes, setTotalTithes] = useState(0);
+  const [subcategories, setSubcategories] = useState([]);
+
+ 
+  useEffect(() => {
+    const fetchTithesAndSubcategories = async () => {
+      // Fetch total tithes
+      const totalTithesQuery = query(
+        collection(db, "givings"),
+        where("giving_type", "==", "Partnership")
+      );
+      const totalTithesUnsubscribe = onSnapshot(
+        totalTithesQuery,
+        (snapshot) => {
+          let tithesAmount = 0;
+          snapshot.forEach((doc) => {
+            tithesAmount += doc.data().amount;
+          });
+          setTotalTithes(tithesAmount);
+        }
+      );
+
+      // Fetch subcategories with type "Offering"
+      const subcategoriesQuery = query(
+        collection(db, "subcategory"),
+        where("type", "==", "Offering")
+      );
+      const subcategoriesUnsubscribe = onSnapshot(
+        subcategoriesQuery,
+        (snapshot) => {
+          const subcategoriesData = [];
+
+          snapshot.forEach((doc) => {
+            const subcategory = doc.data();
+            const subcategoryId = doc.id;
+
+            // Fetch the corresponding giving for the subcategory
+            const givingQuery = query(
+              collection(db, "givings"),
+              where("subcategory", "==", subcategoryId)
+            );
+            getDocs(givingQuery).then((givingSnapshot) => {
+              let subcategoryAmount = 0;
+              givingSnapshot.forEach((givingDoc) => {
+                subcategoryAmount += givingDoc.data().amount;
+              });
+
+              subcategoriesData.push({
+                id: subcategoryId,
+                ...subcategory,
+                amount: subcategoryAmount,
+              });
+
+              // Update the state with the updated subcategories data
+              setSubcategories(subcategoriesData);
+            });
+          });
+        }
+      );
+
+      // Clean up listeners when component is unmounted or dependencies change
+      return () => {
+        totalTithesUnsubscribe();
+        subcategoriesUnsubscribe();
+      };
+    };
+
+    fetchTithesAndSubcategories();
+  }, []);
+
   return (
-    <div className="">
-      {/**chart and amounts */}
-      <div className="flex flex-col md:flex-row md:justify-between items-center">
-        <TitheDoughnut />
-
-        <div className="w-full md:w-2/3 p-4 flex flex-col ">
-          <div className="flex flex-col md:flex-row justify-around">
-            <Card className="m-1">
-              <div className="flex flex-col m-8">
-                <h1 className="text-2xl sm:text-5xl font-bold text-black">
-                  Ghc 18,400
-                </h1>
-                <p className="text-black  text-lg ">Total Partnership</p>
-              </div>
-            </Card>
-            <Card className="m-1">
-              {/* <div className="flex flex-col m-8">
-                <h1 className="text-2xl sm:text-5xl font-bold text-black">
-                  Ghc 4,000
-                </h1>
-                <p className="text-black  text-lg "></p>
-              </div> */}
-              <h1 className="text-lg  font-bold text-center">
-                Available Sub Categories
-              </h1>
-              <ul>
-                <li className="flex flex-row justify-between">
-                  <div className="flex flex-col m-8">
-                    <h1 className="text-lg sm:text-5xl font-bold ">Ghc 400</h1>
-                    <p className=" text-md ">
-                      Church Building
-                    </p>
-                  </div>
-                  <div className="flex flex-col m-8">
-                    <h1 className="text-lg sm:text-5xl font-bold ">
-                      Ghc 4,000
-                    </h1>
-                    <p className="  text-md">
-                  
-                    </p>
-                  </div>
-                </li>
-
-                
-              </ul>
-            </Card>
-          </div>
-
-          <div className="flex flex-col md:flex-row justify-around">
-            {/* <Card className="m-1">
-              <div className="flex flex-col m-8">
-                <h1 className="text-2xl sm:text-5xl font-bold text-black">
-                  Ghc 50,000
-                </h1>
-                <p className="text-black  text-lg ">Total Offering</p>
-              </div>
-            </Card> */}
-            {/* <Card className="m -1">
-              <div className="flex flex-col m-8">
-                <h1 className="text-2xl sm:text-5xl font-bold text-black">
-                  Ghc 10,000
-                </h1>
-                <p className="text-black  text-lg ">Total Partnership</p>
-              </div>
-            </Card> */}
-          </div>
-        </div>
+    <div className="flex flex-col items-center">
+      <h1 className="text-3xl font-bold mt-10">
+        Total Partnership: Ghc {totalTithes}
+      </h1>
+      <div className="mt-10 w-full md:w-2/3">
+        <Card>
+          <h1 className="text-lg font-bold mb-3">Available Sub Categories</h1>
+          <ul>
+            {subcategories.map((subcategory) => (
+              <li
+                key={subcategory.id}
+                className="flex flex-row justify-between py-2 px-4 border-b"
+              >
+                <div>
+                  <p className="text-md">{subcategory.name}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </Card>
+        <PartnershipListing />
       </div>
-
-      <Card className="border-gray-500">
-        <PartnershipListing/>
-      </Card>
     </div>
   );
 };
 
-export default Partnership;
+export default Other;

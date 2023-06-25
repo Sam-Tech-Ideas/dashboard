@@ -1,10 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Doughnut, Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import Tithe from "./Tithe";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "@/firebase/config";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 const  TitheDoughnut = () => {
+
+
+
+
+
+  
   const data = {
     labels: ["Kumasi Crusade", "Easter", "Daily"],
     datasets: [

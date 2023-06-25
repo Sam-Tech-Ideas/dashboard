@@ -1,7 +1,4 @@
-import React from "react";
-//import { Button } from "@/components/ui/button";
-
-import { Fragment, useState } from "react";
+import React, { Fragment, useState } from "react";
 import {
   Button,
   Dialog,
@@ -12,63 +9,58 @@ import {
   Progress,
 } from "@material-tailwind/react";
 import { toast } from "react-hot-toast";
-import {  Timestamp, addDoc, collection, doc, setDoc } from "firebase/firestore";
+import { Timestamp, collection, doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { db, storage } from "@/firebase/config";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { nanoid } from "nanoid";
 
 const AddEvent = () => {
   const [open, setOpen] = useState(false);
-
   const handleOpen = () => setOpen(!open);
-  
-  const [event, setEvent] = useState({
-    //     // use the seconds from the date object for the id
-    id: nanoid(),
 
+  const [event, setEvent] = useState({
+    id: nanoid(),
     title: "",
     description: "",
     imageUrl: "",
     link: "",
-
-    date: "",
-    videoLink: "",
+    startDate: "",
+    endDate: "",
+    venue: "",
   });
 
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setEvent({ ...event, [e.target.name]: value });
+    setEvent({ ...event, [name]: value });
   };
 
-   const handleImageChange = (e) => {
-   const file = e.target.files[0];
-     console.log(file);
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    console.log(file);
 
-     const storageRef = ref(storage, `Eimages/${Date.now()}${file.name}`);
-     const uploadTask = uploadBytesResumable(storageRef, file);
+    const storageRef = ref(storage, `Eimages/${Date.now()}${file.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
 
-     uploadTask.on(
+    uploadTask.on(
       "state_changed",
-       (snapshot) => {
+      (snapshot) => {
         const progress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-     setUploadProgress(progress);
-       },
-       (error) => {
-         alert(error.message);
-     },
-    () => {
-       getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+        setUploadProgress(progress);
+      },
+      (error) => {
+        alert(error.message);
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           setEvent({ ...event, imageUrl: downloadURL });
-        alert("Image uploaded successfully");
-
-       console.log("File available at", downloadURL);
-       });
-       }
-     );
-   };
+          alert("Image uploaded successfully");
+        });
+      }
+    );
+  };
 
   const handleAddEvent = async (e) => {
     e.preventDefault();
@@ -77,18 +69,23 @@ const AddEvent = () => {
     try {
       const docRef = doc(db, "events", event.id); // Replace `event.id` with the actual document ID
 
+      const startDate = new Date(event.startDate);
+      const endDate = new Date(event.endDate);
+
       const eventData = {
         id: event.id,
         title: event.title,
+        startDate: serverTimestamp(startDate),
+        endDate: serverTimestamp(endDate),
+        venue: event.venue,
         description: event.description,
         imageUrl: event.imageUrl,
         link: event.link,
-        date: Timestamp.fromDate(new Date(event.date)),
       };
 
       await setDoc(docRef, eventData);
       toast.success("Event created successfully");
-    
+
       handleOpen();
 
       //console.log("Document written with ID: ", docRef.id);
@@ -102,17 +99,13 @@ const AddEvent = () => {
     <div>
       <Fragment>
         <div className="flex justify-between px-4 pt-8">
-          <h2 className="font-bold text-2xl">Events</h2>
           <div className="flex items-center">
             <button
-              className="bg-purple-800 text-white px-4 py-2 rounded-lg m-2"
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg "
               onClick={handleOpen}
             >
               Add Event
             </button>
-            {/* <button className="hover:text-blue-500">
-            <FaFileDownload size={30} />
-          </button> */}
           </div>
         </div>
 
@@ -150,21 +143,32 @@ const AddEvent = () => {
                 />
               </div>
               <div className="m-2">
-                <label htmlFor="">Event date</label>
+                <label htmlFor="">Event date (Start date)</label>
                 <input
                   type="date"
-                  placeholder="Event date"
+                  placeholder="Starting Event date"
                   className="border-2 border-gray-300 p-2 rounded-lg w-full"
                   onChange={handleInputChange}
-                  value={event.date}
-                  name="date"
+                  value={event.startDate}
+                  name="startDate"
+                />
+              </div>
+              <div className="m-2">
+                <label htmlFor="">Event date(end date)</label>
+                <input
+                  type="date"
+                  placeholder="End date"
+                  className="border-2 border-gray-300 p-2 rounded-lg w-full "
+                  onChange={handleInputChange}
+                  value={event.endDate}
+                  name="endDate"
                 />
               </div>
 
               {uploadProgress === 0 ? null : (
                 <Progress value={uploadProgress} color="blue" />
               )}
-              
+
               <div className="flex flex-col mt-2">
                 <label htmlFor="imageUrl">Upload Image</label>
                 <input
@@ -183,19 +187,29 @@ const AddEvent = () => {
                     value={event.imageUrl}
                     disabled
                   />
-                )} 
+                )}
               </div>
-             
 
               <div className="m-2">
-                <label htmlFor="">Event Video link</label>
+                <label htmlFor="">Event link</label>
                 <input
                   type="url"
-                  placeholder="Event video link"
+                  placeholder="Event link"
                   className="border-2 border-gray-300 p-2 rounded-lg w-full"
                   name="link"
                   onChange={handleInputChange}
                   value={event.link}
+                />
+              </div>
+              <div className="m-2">
+                <label htmlFor="">Event venue</label>
+                <input
+                  type="text"
+                  placeholder="Event venue"
+                  className="border-2 border-gray-300 p-2 rounded-lg w-full"
+                  name="venue"
+                  onChange={handleInputChange}
+                  value={event.venue}
                 />
               </div>
 

@@ -18,6 +18,7 @@ import {
   Typography,
   Button,
 } from "@material-tailwind/react";
+import Link from "next/link";
 
 const NoteList = () => {
   const [notifications, setNotifications] = useState([]);
@@ -42,42 +43,55 @@ const NoteList = () => {
   }, []);
 
   return (
-    <>
-      <div className="overflow-x-auto p-4">
-        <table className="min-w-full table-auto border-2 border-black">
-          <thead className="border-2 border-black">
-            <tr className="bg-gray-400 text-center">
-              <th className="px-4 py-2 border border-r-gray-500">Title</th>
-              <th className="px-4 py-2">Message</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan="6" className="text-center">
-                  <div className="flex justify-center items-center space-x-2">
-                    <Loader />
-                  </div>
-                </td>
-              </tr>
-            ) : (
-              notifications.map((notification) => (
-                <tr key={notification.id} className="text-center">
-                  <td className="border px-4 py-2">{notification.title}</td>
-                  <td>
-                    <Card className="mt-6 w-full">
-                      <CardBody>
-                        <Typography>{notification.message}</Typography>
-                      </CardBody>
-                    </Card>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+    <div>
+      {notifications.length === 0 && (
+        <div className="flex justify-center items-center h-screen">
+          <Typography color="gray" className="text-2xl">
+            No notifications available
+          </Typography>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+        {loading ? (
+          <Loader />
+        ) : (
+          notifications.map((notification) => (
+            <Card key={notification.id}>
+              <CardBody>
+                <Typography color="gray" className="font-bold text-lg">
+                  {notification.title}
+                </Typography>
+                <Typography>{notification.message}</Typography>
+              </CardBody>
+              <CardFooter>
+                <Link href={`/notification/${notification.id}`}>
+                  <Button
+                    color="blue"
+                    size="sm"
+                    ripple="light"
+                    className="mx-4"
+                  >
+                    <FaEdit className="mr-1" />
+                  </Button>
+                </Link>
+                <Button
+                  color="red"
+                  size="sm"
+                  ripple="light"
+                  onClick={() => {
+                    deleteDoc(doc(db, "notifications", notification.id));
+                    toast.success("Notification deleted successfully");
+                  }}
+                >
+                  <FaTrashAlt className="mr-1" />
+                </Button>
+              </CardFooter>
+            </Card>
+          ))
+        )}
       </div>
-    </>
+    </div>
   );
 };
 

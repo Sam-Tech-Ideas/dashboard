@@ -9,6 +9,8 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/firebase/config";
 
 ChartJS.register(
   CategoryScale,
@@ -21,28 +23,46 @@ ChartJS.register(
 
 const BarChart = () => {
   const [chartData, setChartData] = useState({
+    labels: [],
     datasets: [],
   });
 
   const [chartOptions, setChartOptions] = useState({});
 
   useEffect(() => {
-    setChartData({
-      labels: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-      datasets: [
-        {
-          label: "Givings Ghc",
-          data: [12, 19, 3, 5, 2 ],
-          backgroundColor: [
-            "rgb(53, 162, 235)",
-            "rgb(255, 99, 132)",
-            "rgb(75, 192, 192)",
-            "rgb(255, 205, 86)",
-          ],
-        },
-      ],
-    });
+    const fetchChartData = async () => {
+      try {
+        const givingsColRef = collection(db, "givings");
+        const querySnapshot = await getDocs(givingsColRef);
+        const givingsData = querySnapshot.docs.map((doc) => doc.data());
 
+        const labels = givingsData.map((giving) => giving.day);
+        const data = givingsData.map((giving) => giving.amount);
+
+        setChartData({
+          labels: labels,
+          datasets: [
+            {
+              label: "Givings Ghc",
+              data: data,
+              backgroundColor: [
+                "rgb(53, 162, 235)",
+                "rgb(255, 99, 132)",
+                "rgb(75, 192, 192)",
+                "rgb(255, 205, 86)",
+              ],
+            },
+          ],
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchChartData();
+  }, []);
+
+  useEffect(() => {
     setChartOptions({
       plugins: {
         legend: {

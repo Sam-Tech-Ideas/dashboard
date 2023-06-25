@@ -5,11 +5,12 @@ import React from 'react'
 const podcast = () => {
   return (
     <div>
-<AddPodcast/>
-      <PodcastListing/>
+      
 
+      <PodcastListing />
     </div>
   );
 }
 
 export default podcast
+//https://anchor.fm/s/e3be8294/podcast/rss

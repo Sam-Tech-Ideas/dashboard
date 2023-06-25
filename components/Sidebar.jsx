@@ -10,10 +10,24 @@ import { FaCalendar, FaItunesNote, FaLongArrowAltRight, FaMicrophone, FaMicropho
 import { Tooltip, Button } from "@material-tailwind/react";
 import { useRouter } from "next/router";
 import { BellIcon } from "lucide-react";
+import { signOut } from "firebase/auth";
+import { auth } from "@/firebase/config";
  
 const Sidebar = ({ children }) => {
    const router = useRouter();
    const excludeSidebar = router.pathname === "/Login";
+       
+   const handleLogout = () => { 
+    console.log("Logout");
+    signOut(auth).then(() => {
+      // Sign-out successful.
+      router.push("/Login");
+    }).catch((error) => {
+      // An error happened.
+    });
+  };
+
+
 
     if (excludeSidebar) {
       return <main className="w-full">{children}</main>;
@@ -22,7 +36,7 @@ const Sidebar = ({ children }) => {
     <div className="flex">
       <div className="fixed w-20 h-screen p-4 bg-white border-r-[1px] flex flex-col justify-between">
         <div className="flex flex-col items-center">
-          <Link href="/">
+          <Link href="/NewDash">
             <Tooltip content="Dashboard" placement="right-end">
               <div className="bg-purple-800 text-white p-3 rounded-lg inline-block">
                 <RxSketchLogo size={20} />
@@ -30,7 +44,7 @@ const Sidebar = ({ children }) => {
             </Tooltip>
           </Link>
           <span className="border-b-[1px] border-gray-200 w-full p-2"></span>
-          <Link href="/">
+          <Link href="/NewDash">
             <Tooltip content="Dashboard" placement="right-end">
               <div className="bg-gray-100 hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block">
                 <RxDashboard size={20} />
@@ -72,13 +86,13 @@ const Sidebar = ({ children }) => {
               </div>
             </Tooltip> 
           </Link>
-          <Link href="/Login">
+        
             <Tooltip content="Log out" placement="right-end">
-              <div className="bg-gray-100 hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block">
+              <div className="bg-gray-100 hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block" onClick={handleLogout}>
                 <AiOutlineExport size={20} color="red" />
               </div>
             </Tooltip>
-          </Link>
+    
           
         </div>
       </div>

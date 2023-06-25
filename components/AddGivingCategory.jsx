@@ -91,60 +91,27 @@ const AddGivingCategory = () => {
                   value={category.name}
                 />
               </div>
-              {/* <div className="m-2">
-                <label htmlFor="">Giver's contact</label>
-                <input
-                  type="text"
-                  placeholder="Category name"
-                  className="border-2 border-gray-300 p-2 rounded-lg w-full"
-                  required
-                  onChange={(e) =>
-                    setCategory({ ...category, name: e.target.value })
-                  }
-                  value={category.name}
-                />
-              </div> */}
-
-              {/* <div className="m-2">
-                <label htmlFor="">category type</label>
-                <select
-                  className="border-2 border-gray-300 p-2 rounded-lg w-full"
-                  required
-                  value={category.type}
-                  onChange={(e) =>
-                    setCategory({ ...category, type: e.target.value })
-                  }
-                >
-                  <option value="">Select category type</option>
-                  <option value="donation" className="">
-                    Donation
-                  </option>
-
-                  <option value="tithe">Tithe</option>
-
-                  <option value="partnership">Partnership</option>
-                  <option value="offering">Offering</option>
-                  <option value="others">Others</option>
-                </select>
-              </div> */}
+           
               <div className="m-2">
                 <label htmlFor="">subcategory type</label>
                 <select
                   className="border-2 border-gray-300 p-2 rounded-lg w-full"
                   required
+                  placeholder="
+                  Select category type"
                   value={category.type}
                   onChange={(e) =>
                     setCategory({ ...category, type: e.target.value })
                   }
                 >
-                  <option>Select category type</option>
+                
                  
 
-                  <option value="tithe">Tithe</option>
+                  <option value="Tithes">Tithe</option>
 
-                  <option value="partnership">Partnership</option>
-                  <option value="offering">Offering</option>
-                  <option value="others">Others</option>
+                  <option value="Partnership">Partnership</option>
+                  <option value="Offering">Offering</option>
+                  <option value="Others">Others</option>
                 </select>
               </div>
             
@@ -170,7 +137,7 @@ const AddGivingCategory = () => {
                   className="bg-green-500 text-white px-8 py-1 rounded-md hover:bg-green-800 flex items-center "
                   onClick={handleOpen}
                 >
-                  Create giving
+                  Create subcategory
                 </button>
               </div>
             </form>
