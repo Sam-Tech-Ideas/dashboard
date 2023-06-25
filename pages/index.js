@@ -1,5 +1,21 @@
 import Head from 'next/head';
 import Image from 'next/image';
+import React from 'react'
+import {
+  Card,
+  CardBody,
+  CardFooter,
+  Typography,
+  Button,
+} from "@material-tailwind/react";
+import { RocketLaunchIcon } from "@heroicons/react/24/solid";
+import { ArrowLongRightIcon } from "@heroicons/react/24/outline";
+import Cards from '@/components/Cards';
+import Progrssings from '@/components/Progrssings';
+import Recordings from '@/components/Recordings';
+import Progressings from '@/components/Progrssings';
+import Report from '@/components/Report';
+ 
 
 import Header from '../components/Header';
 import TopCards from '../components/TopCards';
@@ -18,12 +34,14 @@ export default function Home() {
     
       <main className='bg-gray-100 min-h-screen'>
         <Header />
-        <TopCards />
-        <div className='p-4 grid md:grid-cols-3 grid-cols-1 gap-4'>
-          <BarChart />
-          <RecentOrders />
-        </div>
+        <Cards />
+         <div className="p-4 grid md:grid-cols-3 grid-cols-1 gap-4">
+        <Progrssings />
+        <Recordings />
+      </div>
+      <Report />
       </main>
     </>
   );
 }
+
