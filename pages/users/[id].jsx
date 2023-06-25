@@ -382,16 +382,16 @@ const UserDetail = () => {
               <label className="block">
                 <span className="text-gray-700">Role</span>
 
-                <Select
+                <select
                   value={user ? user.profileType : ""}
                   onChange={(e) =>
                     setUser({ ...user, profileType: e.target.value })
                   }
-                  className="block w-full mt-1 form-select"
+                  className="block w-full mt-1 form-select py-2 "
                 >
                   <option value="admin">Admin</option>
                   <option value="user">User</option>
-                </Select>
+                </select>
               </label>
             </div>
 
