@@ -33,7 +33,7 @@ const Other = () => {
       // Fetch subcategories with type "Offering"
       const subcategoriesQuery = query(
         collection(db, "subcategory"),
-        where("type", "==", "Offering")
+        where("type", "==", "Partnership")
       );
       const subcategoriesUnsubscribe = onSnapshot(
         subcategoriesQuery,
