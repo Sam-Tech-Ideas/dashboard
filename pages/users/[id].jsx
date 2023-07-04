@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 
 import {
@@ -35,10 +34,9 @@ const UserDetail = () => {
   const [givings, setGivings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-    const [selectedRole, setSelectedRole] = useState("");
+  const [selectedRole, setSelectedRole] = useState("");
 
   const [open, setOpen] = useState(false);
-
 
   const handleOpen = () => setOpen(!open);
   const router = useRouter();
@@ -102,7 +100,7 @@ const UserDetail = () => {
         fullName: user.fullName,
         photo: user.photo,
         username: user.username,
-         dateOfBirth:user.dateOfBirth,
+        dateOfBirth: user.dateOfBirth,
         email: user.email,
         phoneNumber: user.phoneNumber,
         profileType: user.profileType,
@@ -215,6 +213,21 @@ const UserDetail = () => {
         )}
         {user && (
           <dl class="divide-y divide-gray-100">
+            {/**profile photo */}
+            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+              <dt class="text-sm font-medium leading-6 text-gray-900">
+                Profile Photo
+              </dt>
+              <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                <img
+                  src={user.photo}
+                  alt={user.fullName}
+                  className="w-20 h-20 rounded-full"
+                />
+              </dd>
+            </div>
+              
+
             <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt class="text-sm font-medium leading-6 text-gray-900">
                 Full name
