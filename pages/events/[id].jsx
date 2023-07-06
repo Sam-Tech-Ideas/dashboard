@@ -7,10 +7,10 @@ import {
   getDocs,
   onSnapshot,
   query,
+  serverTimestamp,
   setDoc,
   where,
 } from "firebase/firestore";
-import { db } from "@/firebase/config";
 import { FaEdit, FaPencilAlt } from "react-icons/fa";
 import { useRouter } from "next/router";
 import BarChart from "@/components/BarChart";
@@ -28,6 +28,7 @@ import {
   Card,
 } from "@material-tailwind/react";
 import { Bar } from "react-chartjs-2";
+import { db } from "@/firebase/config";
 
 const EventDetail = () => {
   const [event, setEvent] = useState(null);
@@ -69,21 +70,41 @@ const EventDetail = () => {
   const editHandler = async (e) => {
     e.preventDefault();
     console.log("Edit");
+    // try {
+    //   const docRef = doc(db, "events", event.id);
+    //   const eventData = {
+    //     id: event.id,
+
+    //     title: event.title,
+    //     description: event.description,
+    //     startDate: event.startDate,
+    //     venue: event.venue,
+    //     imageUrl: event.imageUrl,
+    //     endDate: event.endDate,
+    //     link:event.link,
+    //   };
+    //   await setDoc(docRef, eventData);
+    //   toast.success("User updated successfully");
+    //   handleOpen();
+    // } catch (error) {
+    //   console.log(error);
+    // }
+
     try {
       const docRef = doc(db, "events", event.id);
       const eventData = {
         id: event.id,
-
         title: event.title,
         description: event.description,
-        startDate: event.startDate,
+        startDate: serverTimestamp(startDate),
+        endDate: serverTimestamp(endDate),
         venue: event.venue,
         imageUrl: event.imageUrl,
-        endDate: event.endDate,
-        link:event.link,
+      
+        link: event.link,
       };
       await setDoc(docRef, eventData);
-      toast.success("User updated successfully");
+      toast.success("Event updated successfully");
       handleOpen();
     } catch (error) {
       console.log(error);
@@ -114,57 +135,59 @@ const EventDetail = () => {
 
       <div class="mt-6 border-t border-gray-100 p-8">
         {loading && <Loader />}
-        {error && (
-          <div className="p-8">
-            <p className="text-red-500">Error: Unable to fetch user data</p>
-          </div>
-        )}
         {event && (
-          <dl class="divide-y divide-gray-100">
-            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt class="text-sm font-medium leading-6 text-gray-900">Title</dt>
-              <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                {event.title}
-              </dd>
-            </div>
-            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt class="text-sm font-medium leading-6 text-gray-900">
-                Description
-              </dt>
-              <dd class="mt-1 text-sm flex items-center  leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                <p>{event.description}</p>
-              </dd>
-            </div>
-            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt class="text-sm font-medium leading-6 text-gray-900">Venue</dt>
-              <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                {event.venue}
-              </dd>
-            </div>
-
-            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt class="text-sm font-medium leading-6 text-gray-900">
-                Starting Date
-              </dt>
-              <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                {event.endDate.toDate().toLocaleDateString()}
-              </dd>
-            </div>
-            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt class="text-sm font-medium leading-6 text-gray-900">
-                End Date
-              </dt>
-              <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                {event.startDate.toDate().toLocaleDateString()}{" "}
-              </dd>
-            </div>
-            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt class="text-sm font-medium leading-6 text-gray-900">Link</dt>
-              <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                {event.link}
-              </dd>
-            </div>
-          </dl>
+          <div className="mt-6 border-t border-gray-100 p-8">
+            <dl className="divide-y divide-gray-100">
+              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt className="text-sm font-medium leading-6 text-gray-900">
+                  Title
+                </dt>
+                <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                  {event.title}
+                </dd>
+              </div>
+              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt className="text-sm font-medium leading-6 text-gray-900">
+                  Description
+                </dt>
+                <dd className="mt-1 text-sm flex items-center leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                  <p>{event.description}</p>
+                </dd>
+              </div>
+              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt className="text-sm font-medium leading-6 text-gray-900">
+                  Venue
+                </dt>
+                <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                  {event.venue}
+                </dd>
+              </div>
+              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt className="text-sm font-medium leading-6 text-gray-900">
+                  Starting Date
+                </dt>
+                <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                  {new Date(event.startDate * 1000).toLocaleString()}
+                </dd>
+              </div>
+              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt className="text-sm font-medium leading-6 text-gray-900">
+                  End Date
+                </dt>
+                <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                  {new Date(event.endDate * 1000).toLocaleString()}
+                </dd>
+              </div>
+              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt className="text-sm font-medium leading-6 text-gray-900">
+                  Link
+                </dt>
+                <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                  {event.link}
+                </dd>
+              </div>
+            </dl>
+          </div>
         )}
       </div>
 

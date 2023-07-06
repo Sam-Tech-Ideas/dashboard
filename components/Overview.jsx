@@ -54,6 +54,22 @@ const Overview = () => {
         setTotalOffering(total);
       });
 
+      // Fetch total offering
+      const othersQuery = query(
+        collection(db, "givings"),
+        where("giving_type", "==", "others")
+      );
+      const otherUnsubscribe = onSnapshot(offeringQuery, (snapshot) => {
+        let total = 0;
+        snapshot.forEach((doc) => {
+          total += doc.data().amount;
+        });
+        setTotalOffering(total);
+      });
+
+
+      
+
       // Clean up listeners when component is unmounted or dependencies change
       return () => {
         partnershipUnsubscribe();
@@ -105,7 +121,7 @@ const Overview = () => {
                 <h1 className="text-2xl sm:text-5xl font-bold text-black">
                   Ghc {totalPartnership}
                 </h1>
-                <p className="text-black  text-lg ">Total Partnership</p>
+                <p className="text-black  text-lg ">Total Others</p>
               </div>
             </Card>
           </div>
