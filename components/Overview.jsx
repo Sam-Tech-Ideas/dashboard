@@ -9,6 +9,7 @@ const Overview = () => {
   const [totalPartnership, setTotalPartnership] = useState(0);
   const [totalTithes, setTotalTithes] = useState(0);
   const [totalOffering, setTotalOffering] = useState(0);
+  const [tottalOthers, setTotalOthers] = useState(0);
 
   useEffect(() => {
     const fetchTotalAmounts = async () => {
@@ -57,15 +58,17 @@ const Overview = () => {
       // Fetch total offering
       const othersQuery = query(
         collection(db, "givings"),
-        where("giving_type", "==", "others")
+        where("giving_type", "==", "Others")
       );
-      const otherUnsubscribe = onSnapshot(offeringQuery, (snapshot) => {
+      const othersUnsubscribe = onSnapshot(othersQuery, (snapshot) => {
         let total = 0;
         snapshot.forEach((doc) => {
           total += doc.data().amount;
         });
-        setTotalOffering(total);
+        setTotalOthers(total);
       });
+      
+
 
 
       
