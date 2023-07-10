@@ -24,6 +24,8 @@ const GivingsList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  const [sortBy, setSortBy] = useState("amount");
+  const [sortOrder, setSortOrder] = useState("desc");
 
   useEffect(() => {
     const fetchGivings = async () => {
@@ -43,6 +45,19 @@ const GivingsList = () => {
     fetchGivings();
   }, []);
 
+  useEffect(() => {
+    // Sorting logic
+    const sortedGivings = [...givings].sort((a, b) => {
+      if (sortOrder === "asc") {
+        return a[sortBy] - b[sortBy];
+      } else {
+        return b[sortBy] - a[sortBy];
+      }
+    });
+
+    setGivings(sortedGivings);
+  }, [sortBy, sortOrder]);
+
   const formatDate = (timestamp) => {
     const date = timestamp.toDate();
     return date.toLocaleString();
@@ -57,8 +72,6 @@ const GivingsList = () => {
     { label: "Date", key: "date_paid" },
   ];
 
- 
-
   const handleSearchTermChange = (event) => {
     setSearchTerm(event.target.value);
   };
@@ -71,19 +84,27 @@ const GivingsList = () => {
     setDateTo(event.target.value);
   };
 
-   const filteredGivings = givings.filter((giving) => {
-     const givingDate = giving.date_paid.toDate();
-     const selectedDateFrom = dateFrom ? new Date(dateFrom) : null;
-     const selectedDateTo = dateTo ? new Date(dateTo) : null;
+  const handleSortChange = (event) => {
+    setSortBy(event.target.value);
+  };
 
-     return (
-       (searchTerm === "" ||
-         giving.full_name.toLowerCase().includes(searchTerm.toLowerCase())) &&
-         
-       (selectedDateFrom === null || givingDate >= selectedDateFrom) &&
-       (selectedDateTo === null || givingDate <= selectedDateTo)
-     );
-   });
+  const handleSortOrderChange = (event) => {
+    setSortOrder(event.target.value);
+  };
+
+  const filteredGivings = givings.filter((giving) => {
+    const givingDate = giving.date_paid.toDate();
+    const selectedDateFrom = dateFrom ? new Date(dateFrom) : null;
+    const selectedDateTo = dateTo ? new Date(dateTo) : null;
+
+    return (
+      (searchTerm === "" ||
+        giving.full_name.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (selectedDateFrom === null || givingDate >= selectedDateFrom) &&
+      (selectedDateTo === null || givingDate <= selectedDateTo)
+    );
+  });
+
   const csvData = [
     ["Name", "Contact", "Amount", "Payment Type", "Payment Method", "Date"],
     ...filteredGivings.map((giving) => [
@@ -122,7 +143,22 @@ const GivingsList = () => {
                 onChange={handleDateToChange}
               />
             </div>
+            <div className="flex flex-col items-center m-4">
+              <label htmlFor="category" className="py-1 ">
+                Sort by
+              </label>
+
+              <select
+                className="border-2 px-4 rounded-full py-2"
+                value={sortOrder}
+                onChange={handleSortOrderChange}
+              >
+                <option value="desc">Descending</option>
+                <option value="asc">Ascending</option>
+              </select>
+            </div>
           </div>
+
           <div className="flex flex-row items-center m-4 pt-8">
             <label htmlFor="" placeholder="" className="mx-1">
               Search
@@ -150,8 +186,7 @@ const GivingsList = () => {
           </div>
         </div>
         <div className=" flex  items-center  m-4">
-          <AddGiving/>
-
+          <AddGiving />
         </div>
 
         <div className="overflow-x-auto">

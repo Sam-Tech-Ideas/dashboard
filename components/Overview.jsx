@@ -67,11 +67,6 @@ const Overview = () => {
         });
         setTotalOthers(total);
       });
-      
-
-
-
-      
 
       // Clean up listeners when component is unmounted or dependencies change
       return () => {
