@@ -179,6 +179,26 @@ const UserDetail = () => {
       },
     ],
   };
+const calculateTotalGivingsByType = () => {
+  const totalGivingsByType = {};
+
+  // Initialize totalGivingsByType with all giving_types and set their initial amount to 0
+  givings.forEach((giving) => {
+    const { giving_type } = giving;
+    totalGivingsByType[giving_type] = 0;
+  });
+
+  // Increment the amounts for each giving_type
+  givings.forEach((giving) => {
+    const { giving_type, amount } = giving;
+    totalGivingsByType[giving_type] += amount;
+  });
+
+  return totalGivingsByType;
+};
+
+const totalGivingsByType = calculateTotalGivingsByType();
+
 
   return (
     <div>
@@ -226,7 +246,6 @@ const UserDetail = () => {
                 />
               </dd>
             </div>
-              
 
             <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt class="text-sm font-medium leading-6 text-gray-900">
@@ -281,19 +300,18 @@ const UserDetail = () => {
           </dl>
         )}
       </div>
+      <div className="px-4 sm:px-0">
+        <h3 className="text-3xl font-semibold leading-7 text-gray-900">
+          User's Giving History
+        </h3>
+      </div>
 
       {/**users giving in barchart */}
       {givings.length > 0 && (
         <div className="p-8">
-          <div className="px-4 sm:px-0">
-            <h3 className="text-3xl font-semibold leading-7 text-gray-900">
-              User's Giving History
-            </h3>
-          </div>
-
-          <div className="mt-6 border-t border-gray-100">
+          <div className=" border-t border-gray-100">
             <dl className="divide-y divide-gray-100">
-              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+              <div className="px-4  sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                 <dt className="text-xl font-medium leading-6 text-gray-900">
                   Total Givings
                 </dt>
@@ -304,47 +322,26 @@ const UserDetail = () => {
             </dl>
           </div>
 
-          <div className="mt-6">
-            <Bar data={givingsData} />
-          </div>
+          <div className="mt-6"></div>
         </div>
       )}
 
-      {givings.length > 0 && (
-        <div className="p-8">
-          <div class="px-4 sm:px-0 ">
-            <h3 class="text-3xl font-semibold leading-7 text-gray-900">
-              User's Giving History
-            </h3>
-          </div>
-
-          <div class="mt-6 border-t border-gray-100">
-            <dl class="divide-y divide-gray-100">
-              <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                <dt class="text-xl  font-medium leading-6 text-gray-900">
-                  Total Givings
-                </dt>
-                <dd class="mt-1 text-xl leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                  Gh{givings.reduce((a, b) => a + b.amount, 0)}
-                </dd>
-              </div>
-              {givings.map((giving) => (
-                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                  <dt class="text-sm font-medium leading-6 text-gray-900">
-                    {giving.giving_type}
-                  </dt>
-                  <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                    Ghc {giving.amount} -{" "}
-                    {new Date(
-                      giving.date_paid.seconds * 1000
-                    ).toLocaleDateString()}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </div>
+      <div className="mt-6">
+        <h3 className="text-3xl font-semibold leading-7 text-gray-900">
+          Total Givings by Type
+        </h3>
+        <div className="mt-4">
+          {Object.entries(totalGivingsByType).map(([givingType, total]) => (
+            <div key={givingType} className="flex items-center mt-2">
+              <span className="text-lg font-medium text-gray-900">
+                {givingType}:
+              </span>
+              <span className="ml-2 text-lg text-gray-700">Gh{total}</span>
+            </div>
+          ))}
         </div>
-      )}
+      </div>
+
       {/* Render the modal component */}
       <Dialog open={open} handler={handleOpen}>
         <DialogHeader>Edit User</DialogHeader>
