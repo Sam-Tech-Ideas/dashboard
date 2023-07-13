@@ -9,6 +9,7 @@ import {
 import { db } from "@/firebase/config";
 import { Card } from "@material-tailwind/react";
 import PartnershipListing from "./PartnershipListing";
+import OtherList from "./OtherList";
 
 const Other = () => {
   const [totalTithes, setTotalTithes] = useState(0);
@@ -20,7 +21,7 @@ const Other = () => {
       // Fetch total tithes
       const totalTithesQuery = query(
         collection(db, "givings"),
-        where("giving_type", "==", "others")
+        where("giving_type", "==", "Others")
       );
       const totalTithesUnsubscribe = onSnapshot(
         totalTithesQuery,
@@ -36,7 +37,7 @@ const Other = () => {
       // Fetch subcategories with type "Partnership"
       const subcategoriesQuery = query(
         collection(db, "subcategory"),
-        where("type", "==", "others")
+        where("type", "==", "Others")
       );
       const subcategoriesSnapshot = await getDocs(subcategoriesQuery);
       const subcategoriesData = [];
@@ -98,7 +99,7 @@ const Other = () => {
   return (
     <div className="flex flex-col items-center">
       <h1 className="text-3xl font-bold mt-10">
-        Total Partnership: Ghc {totalTithes}
+        Total Other: Ghc {totalTithes}
       </h1>
       <div className="mt-10 w-full md:w-2/3">
         <Card>
@@ -121,7 +122,7 @@ const Other = () => {
             ))}
           </ul>
         </Card>
-        <PartnershipListing />
+        <OtherList />
       </div>
     </div>
   );

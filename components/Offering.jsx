@@ -1,30 +1,35 @@
 import React, { useEffect, useState } from "react";
-import { collection, getDocs, onSnapshot, query, where } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  onSnapshot,
+  query,
+  where,
+} from "firebase/firestore";
 import { db } from "@/firebase/config";
 import { Card } from "@material-tailwind/react";
-import TitheList from "./TitheLists";
 import OfferingList from "./OfferingList";
 
 const Offering = () => {
-  const [totalTithes, setTotalTithes] = useState(0);
+  const [totalOfferings, setTotalOfferings] = useState(0);
   const [subcategories, setSubcategories] = useState([]);
+  const [subcategoryTotals, setSubcategoryTotals] = useState({});
 
- 
   useEffect(() => {
-    const fetchTithesAndSubcategories = async () => {
-      // Fetch total tithes
-      const totalTithesQuery = query(
+    const fetchOfferingsAndSubcategories = async () => {
+      // Fetch total offerings
+      const totalOfferingsQuery = query(
         collection(db, "givings"),
         where("giving_type", "==", "Offering")
       );
-      const totalTithesUnsubscribe = onSnapshot(
-        totalTithesQuery,
+      const totalOfferingsUnsubscribe = onSnapshot(
+        totalOfferingsQuery,
         (snapshot) => {
-          let tithesAmount = 0;
+          let offeringsAmount = 0;
           snapshot.forEach((doc) => {
-            tithesAmount += doc.data().amount;
+            offeringsAmount += doc.data().amount;
           });
-          setTotalTithes(tithesAmount);
+          setTotalOfferings(offeringsAmount);
         }
       );
 
@@ -33,52 +38,67 @@ const Offering = () => {
         collection(db, "subcategory"),
         where("type", "==", "Offering")
       );
-      const subcategoriesUnsubscribe = onSnapshot(
-        subcategoriesQuery,
-        (snapshot) => {
-          const subcategoriesData = [];
+      const subcategoriesSnapshot = await getDocs(subcategoriesQuery);
+      const subcategoriesData = [];
 
-          snapshot.forEach((doc) => {
-            const subcategory = doc.data();
-            const subcategoryId = doc.id;
+      subcategoriesSnapshot.forEach((doc) => {
+        const subcategory = doc.data();
+        const subcategoryId = doc.id;
+        subcategoriesData.push({
+          id: subcategoryId,
+          ...subcategory,
+          amount: 0, // Initialize the amount to 0
+        });
+      });
 
-            // Fetch the corresponding giving for the subcategory
-            const givingQuery = query(
-              collection(db, "givings"),
-              where("subcategory", "==", subcategoryId)
-            );
-            getDocs(givingQuery).then((givingSnapshot) => {
-              let subcategoryAmount = 0;
-              givingSnapshot.forEach((givingDoc) => {
-                subcategoryAmount += givingDoc.data().amount;
-              });
+      setSubcategories(subcategoriesData);
 
-              subcategoriesData.push({
-                id: subcategoryId,
-                ...subcategory,
-                amount: subcategoryAmount,
-              });
+      // Fetch givings for each subcategory
+      const givingPromises = subcategoriesData.map((subcategory) => {
+        const givingQuery = query(
+          collection(db, "givings"),
+          where("subcategory", "==", subcategory.id)
+        );
+        return getDocs(givingQuery);
+      });
 
-              // Update the state with the updated subcategories data
-              setSubcategories(subcategoriesData);
-            });
+      const givingSnapshots = await Promise.all(givingPromises);
+
+      const updatedSubcategoriesData = subcategoriesData.map(
+        (subcategory, index) => {
+          let subcategoryAmount = 0;
+          givingSnapshots[index].forEach((doc) => {
+            subcategoryAmount += doc.data().amount;
           });
+          return {
+            ...subcategory,
+            amount: subcategoryAmount,
+          };
         }
       );
 
+      // Calculate subcategory totals
+      const totals = updatedSubcategoriesData.reduce((acc, subcategory) => {
+        acc[subcategory.id] = subcategory.amount;
+        return acc;
+      }, {});
+
+      // Set the subcategory totals in state
+      setSubcategoryTotals(totals);
+
       // Clean up listeners when component is unmounted or dependencies change
       return () => {
-        totalTithesUnsubscribe();
-        subcategoriesUnsubscribe();
+        totalOfferingsUnsubscribe();
       };
     };
 
-    fetchTithesAndSubcategories();
+    fetchOfferingsAndSubcategories();
   }, []);
+
   return (
     <div className="flex flex-col items-center">
       <h1 className="text-3xl font-bold mt-10">
-        Total Offerings: Ghc {totalTithes}
+        Total Offerings: Ghc {totalOfferings}
       </h1>
       <div className="mt-10 w-full md:w-2/3">
         <Card>
@@ -91,6 +111,11 @@ const Offering = () => {
               >
                 <div>
                   <p className="text-md">{subcategory.name}</p>
+                </div>
+                <div>
+                  <p className="text-md">
+                    Total: Ghc {subcategoryTotals[subcategory.id] || 0}
+                  </p>
                 </div>
               </li>
             ))}
