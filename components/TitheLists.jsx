@@ -20,11 +20,14 @@ const TitheList = () => {
   const [givings, setGivings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [category, setCategory] = useState("");
+  const [subcategories, setSubcategories] = useState([]);
+  const [selectedSubcategory, setSelectedSubcategory] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [sortBy, setSortBy] = useState("amount");
   const [sortOrder, setSortOrder] = useState("desc");
+  
 
   useEffect(() => {
     const fetchGivings = async () => {
@@ -47,6 +50,25 @@ const TitheList = () => {
     };
 
     fetchGivings();
+  }, []);
+
+  useEffect(() => {
+   const fetchSubcategories = async () => {
+     try {
+       const q = query(
+         collection(db, "subcategory"),
+         where("type", "==", "Tithes")
+       );
+       const querySnapshot = await getDocs(q);
+       const subcategoriesData = querySnapshot.docs.map((doc) => doc.data());
+       setSubcategories(subcategoriesData);
+     } catch (error) {
+       console.log(error);
+     }
+   };
+
+
+    fetchSubcategories();
   }, []);
 
   useEffect(() => {
@@ -96,6 +118,10 @@ const TitheList = () => {
     setSortOrder(event.target.value);
   };
 
+  const handleSubcategoryChange = (event) => {
+    setSelectedSubcategory(event.target.value);
+  };
+
   const filteredGivings = givings.filter((giving) => {
     const givingDate = giving.date_paid.toDate();
     const selectedDateFrom = dateFrom ? new Date(dateFrom) : null;
@@ -105,7 +131,8 @@ const TitheList = () => {
       (searchTerm === "" ||
         giving.full_name.toLowerCase().includes(searchTerm.toLowerCase())) &&
       (selectedDateFrom === null || givingDate >= selectedDateFrom) &&
-      (selectedDateTo === null || givingDate <= selectedDateTo)
+      (selectedDateTo === null || givingDate <= selectedDateTo) &&
+      (selectedSubcategory === "" || giving.subcategory === selectedSubcategory)
     );
   });
 
@@ -119,6 +146,7 @@ const TitheList = () => {
       formatDate(giving.date_paid),
     ]),
   ];
+
   return (
     <>
       <div className="shadow-sm bg-white">
@@ -189,7 +217,18 @@ const TitheList = () => {
           </div>
         </div>
         <div className=" flex  items-center  m-4">
-          <AddGivingCategory />
+          <select
+            className="border-2 px-4 rounded-full py-2"
+            value={selectedSubcategory}
+            onChange={handleSubcategoryChange}
+          >
+            <option value="">All</option>
+            {subcategories.map((subcategory) => (
+              <option key={subcategory.id} value={subcategory.id}>
+                {subcategory.name}
+              </option>
+            ))}
+          </select>{" "}
         </div>
 
         <div className="overflow-x-auto">

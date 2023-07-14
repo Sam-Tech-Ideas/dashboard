@@ -25,6 +25,9 @@ const PartnershipListing = () => {
   const [dateTo, setDateTo] = useState("");
   const [sortBy, setSortBy] = useState("amount");
   const [sortOrder, setSortOrder] = useState("desc");
+   const [selectedSubcategory, setSelectedSubcategory] = useState("");
+   const [subcategories, setSubcategories] = useState([]);
+
 
   useEffect(() => {
     const fetchGivings = async () => {
@@ -48,6 +51,26 @@ const PartnershipListing = () => {
 
     fetchGivings();
   }, []);
+
+     useEffect(() => {
+       const fetchSubcategories = async () => {
+         try {
+           const q = query(
+             collection(db, "subcategory"),
+             where("type", "==", "Partnership")
+           );
+           const querySnapshot = await getDocs(q);
+           const subcategoriesData = querySnapshot.docs.map((doc) =>
+             doc.data()
+           );
+           setSubcategories(subcategoriesData);
+         } catch (error) {
+           console.log(error);
+         }
+       };
+
+       fetchSubcategories();
+     }, []);
 
   useEffect(() => {
     // Sorting logic
@@ -95,6 +118,10 @@ const PartnershipListing = () => {
   const handleSortOrderChange = (event) => {
     setSortOrder(event.target.value);
   };
+
+    const handleSubcategoryChange = (event) => {
+      setSelectedSubcategory(event.target.value);
+    };
 
   const filteredGivings = givings.filter((giving) => {
     const givingDate = giving.date_paid.toDate();
@@ -187,8 +214,28 @@ const PartnershipListing = () => {
             </CSVLink>
           </div>
         </div>
-        <div className=" flex  items-center  m-4">
-          <AddGivingCategory />
+        <div className=" flex  items-center  m-4 ">
+          <div>
+            <AddGivingCategory />
+          </div>
+          <div className="flex flex-col items-center"> 
+            <label htmlFor="category" className="py-1 ">
+              Sort by category
+            </label>
+
+            <select
+              className="border-2 px-4 rounded-full py-2 "
+              value={selectedSubcategory}
+              onChange={handleSubcategoryChange}
+            >
+              <option value="">All</option>
+              {subcategories.map((subcategory) => (
+                <option key={subcategory.id} value={subcategory.id}>
+                  {subcategory.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <div className="overflow-x-auto">
