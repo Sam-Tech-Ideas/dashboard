@@ -29,7 +29,7 @@ const Groups = () => {
           <div className="flex justify-around ">
             <div>
               <h1 className="text-3xl font-medium title-font text-gray-900 mb-12 text-center">
-                Our Groups
+                All Groups
               </h1>
             </div>
             <div>
