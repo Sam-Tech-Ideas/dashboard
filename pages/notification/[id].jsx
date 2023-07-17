@@ -89,7 +89,7 @@ const NotificationDetail = () => {
 
   return (
     <div>
-      <div className="p-8 ">{/* Other code... */}</div>
+      <div className="p-8 ">{/* O*/}</div>
       <div className="p-8">
         <div className="flex justify-between">
           <h1 className="text-2xl font-semibold text-gray-900">
