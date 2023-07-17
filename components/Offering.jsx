@@ -8,32 +8,33 @@ import {
 } from "firebase/firestore";
 import { db } from "@/firebase/config";
 import { Card } from "@material-tailwind/react";
+import PartnershipListing from "./PartnershipListing";
 import OfferingList from "./OfferingList";
 
-const Offering = () => {
-  const [totalOfferings, setTotalOfferings] = useState(0);
+const Other = () => {
+  const [totalTithes, setTotalTithes] = useState(0);
   const [subcategories, setSubcategories] = useState([]);
   const [subcategoryTotals, setSubcategoryTotals] = useState({});
 
   useEffect(() => {
-    const fetchOfferingsAndSubcategories = async () => {
-      // Fetch total offerings
-      const totalOfferingsQuery = query(
+    const fetchTithesAndSubcategories = async () => {
+      // Fetch total tithes
+      const totalTithesQuery = query(
         collection(db, "givings"),
         where("giving_type", "==", "Offering")
       );
-      const totalOfferingsUnsubscribe = onSnapshot(
-        totalOfferingsQuery,
+      const totalTithesUnsubscribe = onSnapshot(
+        totalTithesQuery,
         (snapshot) => {
-          let offeringsAmount = 0;
+          let tithesAmount = 0;
           snapshot.forEach((doc) => {
-            offeringsAmount += doc.data().amount;
+            tithesAmount += doc.data().amount;
           });
-          setTotalOfferings(offeringsAmount);
+          setTotalTithes(tithesAmount);
         }
       );
 
-      // Fetch subcategories with type "Offering"
+      // Fetch subcategories with type "Partnership"
       const subcategoriesQuery = query(
         collection(db, "subcategory"),
         where("type", "==", "Offering")
@@ -57,7 +58,7 @@ const Offering = () => {
       const givingPromises = subcategoriesData.map((subcategory) => {
         const givingQuery = query(
           collection(db, "givings"),
-          where("subcategory", "==", subcategory.id)
+          where("sub_category", "==", subcategory.id)
         );
         return getDocs(givingQuery);
       });
@@ -88,17 +89,17 @@ const Offering = () => {
 
       // Clean up listeners when component is unmounted or dependencies change
       return () => {
-        totalOfferingsUnsubscribe();
+        totalTithesUnsubscribe();
       };
     };
 
-    fetchOfferingsAndSubcategories();
+    fetchTithesAndSubcategories();
   }, []);
 
   return (
     <div className="flex flex-col items-center">
       <h1 className="text-3xl font-bold mt-10">
-        Total Offerings: Ghc {totalOfferings}
+        Total Offering: Ghc {totalTithes}
       </h1>
       <div className="mt-10 w-full md:w-2/3">
         <Card>
@@ -127,4 +128,4 @@ const Offering = () => {
   );
 };
 
-export default Offering;
+export default Other;

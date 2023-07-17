@@ -132,10 +132,9 @@ const TitheList = () => {
         giving.full_name.toLowerCase().includes(searchTerm.toLowerCase())) &&
       (selectedDateFrom === null || givingDate >= selectedDateFrom) &&
       (selectedDateTo === null || givingDate <= selectedDateTo) &&
-      (selectedSubcategory === "" || giving.subcategory === selectedSubcategory)
+      (selectedSubcategory === "" || giving.sub_category === selectedSubcategory)
     );
   });
-
   const csvData = [
     ["Name", "Contact", "Amount", "Payment Type", "Payment Method", "Date"],
     ...filteredGivings.map((giving) => [

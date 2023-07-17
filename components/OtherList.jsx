@@ -121,19 +121,19 @@ const OtherList = () => {
   const handleSubcategoryChange = (event) => {
     setSelectedSubcategory(event.target.value);
   };
+const filteredGivings = givings.filter((giving) => {
+  const givingDate = giving.date_paid.toDate();
+  const selectedDateFrom = dateFrom ? new Date(dateFrom) : null;
+  const selectedDateTo = dateTo ? new Date(dateTo) : null;
 
-  const filteredGivings = givings.filter((giving) => {
-    const givingDate = giving.date_paid.toDate();
-    const selectedDateFrom = dateFrom ? new Date(dateFrom) : null;
-    const selectedDateTo = dateTo ? new Date(dateTo) : null;
-
-    return (
-      (searchTerm === "" ||
-        giving.full_name.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (selectedDateFrom === null || givingDate >= selectedDateFrom) &&
-      (selectedDateTo === null || givingDate <= selectedDateTo)
-    );
-  });
+  return (
+    (searchTerm === "" ||
+      giving.full_name.toLowerCase().includes(searchTerm.toLowerCase())) &&
+    (selectedDateFrom === null || givingDate >= selectedDateFrom) &&
+    (selectedDateTo === null || givingDate <= selectedDateTo) &&
+    (selectedSubcategory === "" || giving.sub_category === selectedSubcategory)
+  );
+});
 
   const csvData = [
     ["Name", "Contact", "Amount", "Payment Type", "Payment Method", "Date"],

@@ -8,9 +8,11 @@ import {
 } from "firebase/firestore";
 import { db } from "@/firebase/config";
 import { Card } from "@material-tailwind/react";
+import PartnershipListing from "./PartnershipListing";
+import OfferingList from "./OfferingList";
 import TitheList from "./TitheLists";
 
-const Tithe = () => {
+const Other = () => {
   const [totalTithes, setTotalTithes] = useState(0);
   const [subcategories, setSubcategories] = useState([]);
   const [subcategoryTotals, setSubcategoryTotals] = useState({});
@@ -33,7 +35,7 @@ const Tithe = () => {
         }
       );
 
-      // Fetch subcategories with type "Tithes"
+      // Fetch subcategories with type "Partnership"
       const subcategoriesQuery = query(
         collection(db, "subcategory"),
         where("type", "==", "Tithes")
@@ -57,7 +59,7 @@ const Tithe = () => {
       const givingPromises = subcategoriesData.map((subcategory) => {
         const givingQuery = query(
           collection(db, "givings"),
-          where("subcategory", "==", subcategory.id)
+          where("sub_category", "==", subcategory.id)
         );
         return getDocs(givingQuery);
       });
@@ -127,4 +129,4 @@ const Tithe = () => {
   );
 };
 
-export default Tithe;
+export default Other;

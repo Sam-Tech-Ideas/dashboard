@@ -130,9 +130,10 @@ const OfferingList = () => {
         giving.full_name.toLowerCase().includes(searchTerm.toLowerCase())) &&
       (selectedDateFrom === null || givingDate >= selectedDateFrom) &&
       (selectedDateTo === null || givingDate <= selectedDateTo) &&
-      (selectedSubcategory === "" || giving.subcategory === selectedSubcategory)
+      (selectedSubcategory === "" || giving.sub_category === selectedSubcategory)
     );
   });
+
 
   const csvData = [
     ["Name", "Contact", "Amount", "Payment Type", "Payment Method", "Date"],
@@ -145,14 +146,13 @@ const OfferingList = () => {
     ]),
   ];
 
+  const displaySubcategory = (subcategoryId) => {
+    const subcategory = subcategories.find(
+      (subcategory) => subcategory.id === subcategoryId
+    );
 
-   const displaySubcategory = (subcategoryId) => {
-     const subcategory = subcategories.find(
-       (subcategory) => subcategory.id === subcategoryId
-     );
-
-     return subcategory ? subcategory.name : "N/A";
-   };
+    return subcategory ? subcategory.name : "N/A";
+  };
   return (
     <>
       <div className="shadow-sm bg-white">
