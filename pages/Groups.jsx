@@ -1,0 +1,90 @@
+import React, { useEffect, useState } from "react";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase/config";
+import {
+  Card,
+  CardHeader,
+  CardBody,
+  Typography,
+  Avatar,
+} from "@material-tailwind/react";
+
+const Groups = () => {
+  const [groups, setGroups] = useState([]);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, "groups"), (snapshot) => {
+      const groupsData = snapshot.docs.map((doc) => doc.data());
+      setGroups(groupsData);
+    });
+
+    // Cleanup function to unsubscribe from the Firestore listener
+    return () => unsubscribe();
+  }, []);
+
+  return (
+    <>
+      <section className="text-gray-600 body-font">
+        <div className="container px-5 py-24 mx-auto">
+          <div className="flex justify-around ">
+            <div>
+              <h1 className="text-3xl font-medium title-font text-gray-900 mb-12 text-center">
+                Our Groups
+              </h1>
+            </div>
+            <div>
+              <button className="bg-blue-500 px-6 py-2 text-white rounded">
+                Create Group
+              </button>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap -m-4">
+            {groups.map((group) => (
+              <div key={group.id} className="xl:w-1/4 md:w-1/2 p-4">
+                <Card
+                  shadow={false}
+                  className="relative grid h-[20rem] w-full max-w-[48rem] items-end justify-center overflow-hidden text-center"
+                >
+                  <CardHeader
+                    floated={false}
+                    shadow={false}
+                    color="transparent"
+                    className='absolute inset-0 m-0 h-full w-full rounded-none'
+                    style={
+
+                        {
+                            backgroundImage: `url(${group.groupImage})`,
+                            backgroundSize: "cover",
+                            backgroundPosition: "center",
+                            backgroundRepeat: "no-repeat",
+
+                        }
+                    }
+                   
+                  >
+                    <div className="to-bg-black-10 absolute inset-0 h-full w-full bg-gradient-to-t from-black/80 via-black/50" />
+                  </CardHeader>
+                  <CardBody className="relative py-14 px-6 md:px-12">
+                    <Typography
+                      variant="h2"
+                      color="white"
+                      className="mb-6 font-medium leading-[1.5]"
+                    >
+                      {group.name}
+                    </Typography>
+                    <Typography variant="h5" className="mb-4 text-gray-400">
+                      {group.members.length} Members
+                    </Typography>
+                  </CardBody>
+                </Card>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
+  );
+};
+
+export default Groups;

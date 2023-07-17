@@ -145,6 +145,14 @@ const OfferingList = () => {
     ]),
   ];
 
+
+   const displaySubcategory = (subcategoryId) => {
+     const subcategory = subcategories.find(
+       (subcategory) => subcategory.id === subcategoryId
+     );
+
+     return subcategory ? subcategory.name : "N/A";
+   };
   return (
     <>
       <div className="shadow-sm bg-white">
@@ -274,7 +282,9 @@ const OfferingList = () => {
                       </td>
                       <td className="border px-4 py-2">{giving.full_name}</td>
                       <td className="border px-4 py-2">{giving.amount}</td>
-                      <td className="border px-4 py-2">{giving.giving_type}</td>
+                      <td className="border px-4 py-2">
+                        {displaySubcategory(giving.sub_category)}
+                      </td>
                       <td className="border px-4 py-2">
                         {formatDate(giving.date_paid)}
                       </td>

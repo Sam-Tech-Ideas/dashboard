@@ -5,7 +5,7 @@ import { RxSketchLogo, RxDashboard, RxPerson } from "react-icons/rx";
 import { HiOutlineShoppingBag } from "react-icons/hi";
 import { FiSettings } from "react-icons/fi";
 import { BsCashCoin } from "react-icons/bs";
-import {AiFillNotification, AiOutlineExport, AiTwotoneNotification} from "react-icons/ai";
+import {AiFillNotification, AiOutlineExport, AiOutlineUsergroupAdd, AiTwotoneNotification} from "react-icons/ai";
 import { FaCalendar, FaItunesNote, FaLongArrowAltRight, FaMicrophone, FaMicrophoneAlt, FaPodcast } from "react-icons/fa";
 import { Tooltip, Button } from "@material-tailwind/react";
 import { useRouter } from "next/router";
@@ -79,21 +79,29 @@ const Sidebar = ({ children }) => {
               </div>
             </Tooltip>
           </Link>
+          <Link href="/Groups">
+            <Tooltip content="Groups" placement="right-end">
+              <div className="bg-gray-100 hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block">
+                <AiOutlineUsergroupAdd size={20} />
+              </div>
+            </Tooltip>
+          </Link>
           <Link href="/Notification">
-             <Tooltip content="Notifications" placement="right-end">
+            <Tooltip content="Notifications" placement="right-end">
               <div className="bg-gray-100 hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block">
                 <BellIcon size={20} />
               </div>
-            </Tooltip> 
-          </Link>
-        
-            <Tooltip content="Log out" placement="right-end">
-              <div className="bg-gray-100 hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block" onClick={handleLogout}>
-                <AiOutlineExport size={20} color="red" />
-              </div>
             </Tooltip>
-    
-          
+          </Link>
+
+          <Tooltip content="Log out" placement="right-end">
+            <div
+              className="bg-gray-100 hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block"
+              onClick={handleLogout}
+            >
+              <AiOutlineExport size={20} color="red" />
+            </div>
+          </Tooltip>
         </div>
       </div>
       <main className="ml-20 w-full">{children}</main>

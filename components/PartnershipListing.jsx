@@ -146,6 +146,16 @@ const PartnershipListing = () => {
       formatDate(giving.date_paid),
     ]),
   ];
+
+  //display subcategory of giving_type
+ const displaySubcategory = (subcategoryId) => {
+   const subcategory = subcategories.find(
+     (subcategory) => subcategory.id === subcategoryId
+   );
+
+   return subcategory ? subcategory.name : "N/A";
+ };
+
   return (
     <>
       <div className="shadow-sm bg-white">
@@ -218,7 +228,7 @@ const PartnershipListing = () => {
           <div>
             <AddGivingCategory />
           </div>
-          <div className="flex flex-col items-center"> 
+          <div className="flex flex-col items-center">
             <label htmlFor="category" className="py-1 ">
               Sort by category
             </label>
@@ -251,6 +261,7 @@ const PartnershipListing = () => {
                   <th className="px-4 py-4">Name</th>
                   <th className="px-4 py-4">Amount (Ghc)</th>
                   <th className="px-4 py-4">Payment Type</th>
+              
                   <th className="px-4 py-4">Date</th>
                 </tr>
               </thead>
@@ -275,7 +286,10 @@ const PartnershipListing = () => {
 
                       <td className="border px-4 py-2">{giving.full_name}</td>
                       <td className="border px-4 py-2">{giving.amount}</td>
-                      <td className="border px-4 py-2">{giving.giving_type}</td>
+                      {/* <td className="border px-4 py-2">{giving.giving_type}</td> */}
+                      <td className="border px-4 py-2">
+                        {displaySubcategory(giving.sub_category)}
+                      </td>
                       <td className="border px-4 py-2">
                         {formatDate(giving.date_paid)}
                       </td>

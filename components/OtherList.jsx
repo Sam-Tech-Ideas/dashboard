@@ -145,6 +145,13 @@ const OtherList = () => {
       formatDate(giving.date_paid),
     ]),
   ];
+   const displaySubcategory = (subcategoryId) => {
+     const subcategory = subcategories.find(
+       (subcategory) => subcategory.id === subcategoryId
+     );
+
+     return subcategory ? subcategory.name : "N/A";
+   };
 
   return (
     <>
@@ -275,7 +282,9 @@ const OtherList = () => {
 
                       <td className="border px-4 py-2">{giving.full_name}</td>
                       <td className="border px-4 py-2">{giving.amount}</td>
-                      <td className="border px-4 py-2">{giving.giving_type}</td>
+                      <td className="border px-4 py-2">
+                        {displaySubcategory(giving.sub_category)}
+                      </td>
                       <td className="border px-4 py-2">
                         {formatDate(giving.date_paid)}
                       </td>
