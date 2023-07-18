@@ -41,6 +41,40 @@ const EventDetail = () => {
   const router = useRouter();
   const { id } = router.query;
 
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [users, setUsers] = useState([]);
+
+const handleUserUpdate = (snapshot) => {
+  const usersList = snapshot.docs.map((doc) => doc.data());
+  setUsers(usersList);
+};
+
+
+  // Subscribe to the "users" collection changes when the component mounts
+  useEffect(() => {
+    const usersRef = collection(db, "users");
+    const unsubscribe = onSnapshot(usersRef, handleUserUpdate);
+
+    // Unsubscribe from the listener when the component unmounts
+    return () => unsubscribe();
+  }, []);
+
+  // Call the fetchUsers function when the component mounts
+
+  const handleUserSelection = (userId) => {
+    setSelectedUsers((prevSelected) => {
+      const user = users.find((user) => user.id === userId);
+
+      // Check if the user is already selected, if yes, remove from the list
+      if (prevSelected.some((u) => u.id === userId)) {
+        return prevSelected.filter((u) => u.id !== userId);
+      } else {
+        // If the user is not selected, add to the list
+        return [...prevSelected, user];
+      }
+    });
+  };
+
   useEffect(() => {
     setLoading(true);
 
@@ -97,11 +131,9 @@ const EventDetail = () => {
         title: event.title,
         description: event.description,
         startDate: serverTimestamp(startDate),
-        endDate: serverTimestamp(endDate),
+        allowed_members: selectedUsers,
         venue: event.venue,
         imageUrl: event.imageUrl,
-      
-        link: event.link,
       };
       await setDoc(docRef, eventData);
       toast.success("Event updated successfully");
@@ -164,7 +196,7 @@ const EventDetail = () => {
               </div>
               <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                 <dt className="text-sm font-medium leading-6 text-gray-900">
-                  Starting Date
+                  Date
                 </dt>
                 <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
                   {event.startDate &&
@@ -173,21 +205,43 @@ const EventDetail = () => {
               </div>
               <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                 <dt className="text-sm font-medium leading-6 text-gray-900">
+                  Allowed Members
+                </dt>
+                <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                  {event.allowed_members &&
+
+                    event.allowed_members.map((user) => (
+
+                      <div className="flex items-center space-x-2">
+                      <div>
+                        <p>
+                          {
+                            user.fullName
+                          }
+                        </p>
+                      </div>
+                      </div>
+                    )
+                    )}
+                </dd>
+              </div>
+              {/* <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt className="text-sm font-medium leading-6 text-gray-900">
                   End Date
                 </dt>
                 <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
                   {event.endDate &&
                     new Date(event.endDate.toDate()).toLocaleString()}
                 </dd>
-              </div>
-              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+              </div> */}
+              {/* <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                 <dt className="text-sm font-medium leading-6 text-gray-900">
                   Link
                 </dt>
                 <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
                   {event.link}
                 </dd>
-              </div>
+              </div> */}
             </dl>
           </div>
         )}
@@ -243,7 +297,7 @@ const EventDetail = () => {
                 />
               </label>
               <label className="block">
-                <span className="text-gray-700">Starting Date</span>
+                <span className="text-gray-700">Date</span>
                 <Input
                   type="date"
                   name="startDate"
@@ -255,31 +309,24 @@ const EventDetail = () => {
                   className="block w-full mt-1 form-input"
                 />
               </label>
-
               <label className="block">
-                <span className="text-gray-700">End Date</span>
-                <Input
-                  type="date"
-                  name="endDate"
-                  id="endDate"
-                  value={event ? event.endDate : ""}
-                  onChange={(e) =>
-                    setEvent({ ...event, endDate: e.target.value })
-                  }
-                  className="block w-full mt-1 form-input"
-                />
-              </label>
-
-              <label className="block">
-                <span className="text-gray-700">Link</span>
-                <Input
-                  type="text"
-                  name="link"
-                  id="link"
-                  value={event ? event.link : ""}
-                  onChange={(e) => setEvent({ ...event, link: e.target.value })}
-                  className="block w-full mt-1 form-input"
-                />
+                <span className="text-gray-700">Allowed Members</span>
+                <div className="mt-1 space-y-2">
+                  {users.map((user) => (
+                    <label key={user.id} className="inline-flex items-center">
+                      <input
+                        type="checkbox"
+                        className="form-checkbox h-5 w-5 text-blue-600"
+                        value={user.id}
+                        checked={selectedUsers.some((u) => u.id === user.id)}
+                        onChange={() => handleUserSelection(user.id)}
+                      />
+                      <span className="ml-2 text-gray-700">
+                        {user.fullName}
+                      </span>
+                    </label>
+                  ))}
+                </div>
               </label>
             </div>
 

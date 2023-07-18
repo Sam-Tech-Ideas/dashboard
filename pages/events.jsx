@@ -48,9 +48,21 @@ const Events = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [selectedUsers, setSelectedUsers] = useState([]); // Step 1: State to keep track of selected users
+
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(!open);
+
+
+   const handleUserSelect = (userId) => {
+     // Step 2: Function to handle the selection of users
+     if (selectedUsers.includes(userId)) {
+       setSelectedUsers((prevUsers) => prevUsers.filter((id) => id !== userId));
+     } else {
+       setSelectedUsers((prevUsers) => [...prevUsers, userId]);
+     }
+   };
 
   useEffect(() => {
     setLoading(true);
@@ -72,6 +84,20 @@ const Events = () => {
     }
   }, []);
 
+
+    const createEvent = async (eventData) => {
+      try {
+        const newEventRef = await addDoc(collection(db, "events"), eventData);
+        const eventId = newEventRef.id;
+        await updateEventWithSelectedUsers(eventId); // Step 3: Update the event with selected users
+        toast.success("Event created successfully");
+      } catch (error) {
+        console.log(error);
+        toast.error("Error creating event");
+      }
+    };
+
+
   const deleteEvent = async (id, imageUrl) => {
     try {
       await deleteDoc(doc(db, "events", id));
@@ -82,10 +108,6 @@ const Events = () => {
       toast.success("Event deleted successfully");
     }
   };
-
-
- 
-
 
   return (
     <div>
@@ -136,12 +158,7 @@ const Events = () => {
                       >
                         Venue
                       </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase"
-                      >
-                        Link
-                      </th>
+
                       <th
                         scope="col"
                         className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase"
@@ -152,14 +169,9 @@ const Events = () => {
                         scope="col"
                         className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase"
                       >
-                        Starting Date
+                        Allowed Members
                       </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase"
-                      >
-                        End Date
-                      </th>
+
                       <th
                         scope="col"
                         className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase"
@@ -193,12 +205,7 @@ const Events = () => {
                             {event.venue}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{}</div>
-                          <div className="text-sm text-gray-500">
-                            {event.link}
-                          </div>
-                        </td>
+
                         <td className="px-6 py-4 ">
                           <p className="text-sm text-gray-900">
                             {event.description}
@@ -206,18 +213,10 @@ const Events = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">
-                            {event.startDate &&
-                              new Date(
-                                event.startDate.toDate()
-                              ).toLocaleString()}
+                            
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">
-                            {event.endDate &&
-                              new Date(event.endDate.toDate()).toLocaleString()}
-                          </div>
-                        </td>
+
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-500">
                             {/**open a @material tailwind menu when an icon is clicked */}
