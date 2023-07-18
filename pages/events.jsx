@@ -165,12 +165,12 @@ const Events = () => {
                       >
                         Description
                       </th>
-                      <th
+                      {/* <th
                         scope="col"
                         className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase"
                       >
                         Allowed Members
-                      </th>
+                      </th> */}
 
                       <th
                         scope="col"
@@ -211,11 +211,11 @@ const Events = () => {
                             {event.description}
                           </p>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        {/* <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">
                             
                           </div>
-                        </td>
+                        </td> */}
 
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-500">
