@@ -27,6 +27,9 @@ const AddEvent = () => {
     startDate: "",
     endDate: "",
     venue: "",
+    //an array of strings of user IDs
+    allowed_members: [""],
+    attendees: [""],
   });
 
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -81,6 +84,8 @@ const AddEvent = () => {
         description: event.description,
         imageUrl: event.imageUrl,
         link: event.link,
+        //an array of strings of user IDs
+        allowed_members: event.allowed_members,
       };
 
       await setDoc(docRef, eventData);
@@ -143,7 +148,7 @@ const AddEvent = () => {
                 />
               </div>
               <div className="m-2">
-                <label htmlFor="">Event date (Start date)</label>
+                <label htmlFor="">Event date</label>
                 <input
                   type="date"
                   placeholder="Starting Event date"
@@ -153,7 +158,7 @@ const AddEvent = () => {
                   name="startDate"
                 />
               </div>
-              <div className="m-2">
+              {/* <div className="m-2">
                 <label htmlFor="">Event date(end date)</label>
                 <input
                   type="date"
@@ -163,7 +168,7 @@ const AddEvent = () => {
                   value={event.endDate}
                   name="endDate"
                 />
-              </div>
+              </div> */}
 
               {uploadProgress === 0 ? null : (
                 <Progress value={uploadProgress} color="blue" />
@@ -190,7 +195,7 @@ const AddEvent = () => {
                 )}
               </div>
 
-              <div className="m-2">
+              {/* <div className="m-2">
                 <label htmlFor="">Event link</label>
                 <input
                   type="url"
@@ -200,7 +205,7 @@ const AddEvent = () => {
                   onChange={handleInputChange}
                   value={event.link}
                 />
-              </div>
+              </div> */}
               <div className="m-2">
                 <label htmlFor="">Event venue</label>
                 <input
