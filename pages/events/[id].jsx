@@ -211,7 +211,7 @@ const handleUserCheckboxChange = async (userID, block) => {
      const docRef = doc(db, "events", event.id);
      try {
        setDoc(docRef, { blocked_members: blockedMembers }, { merge: true });
-       toast.success("Blocked members updated successfully");
+    
      } catch (error) {
        console.log(error);
        toast.error("Failed to update blocked members");
@@ -225,7 +225,7 @@ const handleUserCheckboxChange = async (userID, block) => {
 
    try {
      await setDoc(docRef, { blocked_members: blockedMembers }, { merge: true });
-     toast.success("Blocked members updated successfully");
+
    } catch (error) {
      console.log(error);
      toast.error("Failed to update blocked members");
@@ -237,7 +237,7 @@ const handleUserCheckboxChange = async (userID, block) => {
    const userRef = doc(db, "users", userID);
    try {
      await setDoc(userRef, { block }, { merge: true });
-     toast.success("User blocked status updated successfully");
+  
    } catch (error) {
      console.log(error);
      toast.error("Failed to update user blocked status");
