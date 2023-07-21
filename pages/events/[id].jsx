@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import {
   collection,
@@ -32,7 +32,6 @@ import { Bar } from "react-chartjs-2";
 import { db } from "@/firebase/config";
 import Link from "next/link";
 
-
 const EventDetail = () => {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -43,111 +42,68 @@ const EventDetail = () => {
   const handleOpen = () => setOpen(!open);
   const router = useRouter();
   const { id } = router.query;
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const [sortOption, setSortOption] = useState("all"); // 'all', 'blocked', or 'unblocked'
+  const [sortOrder, setSortOrder] = useState("asc");
 
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [users, setUsers] = useState([]);
+  const [blockAll, setBlockAll] = useState(false);
+  const blockAllCheckboxRef = useRef(null);
 
-const handleUserUpdate = (snapshot) => {
-  const usersList = snapshot.docs.map((doc) => doc.data());
-  setUsers(usersList);
-};
-
-
-  // Subscribe to the "users" collection changes when the component mounts
   useEffect(() => {
     const usersRef = collection(db, "users");
-    const unsubscribe = onSnapshot(usersRef, handleUserUpdate);
+    const unsubscribe = onSnapshot(usersRef);
 
     // Unsubscribe from the listener when the component unmounts
     return () => unsubscribe();
   }, []);
 
-  // Call the fetchUsers function when the component mounts
+   useEffect(() => {
+     setLoading(true);
 
-  const handleUserSelection = (userId) => {
-    setSelectedUsers((prevSelected) => {
-      const user = users.find((user) => user.id === userId);
-
-      // Check if the user is already selected, if yes, remove from the list
-      if (prevSelected.some((u) => u.id === userId)) {
-        return prevSelected.filter((u) => u.id !== userId);
-      } else {
-        // If the user is not selected, add to the list
-        return [...prevSelected, user];
-      }
-    });
-  };
-
-   const blockUsers = async () => {
      try {
-       const docRef = doc(db, "events", event.id);
-       const eventData = {
-         id: event.id,
-         title: event.title,
-         description: event.description,
-         startDate: event.startDate,
-         allowed_members: selectedUsers, // Use the selectedUsers state to update the allowed_members field
-         venue: event.venue,
-         imageUrl: event.imageUrl,
-       };
+       const docRef = doc(db, "events", id);
+       const unsubscribe = onSnapshot(docRef, (docSnap) => {
+         if (docSnap.exists()) {
+           console.log("Document data:", docSnap.data());
+           setEvent(docSnap.data()); // Update the event state with the new data
+           setLoading(false);
+         } else {
+           console.log("No such document!");
+           setLoading(false);
+           toast.error(
+             "Unable to provide data check your internet connection and try again"
+           );
+         }
+       });
 
-       await setDoc(docRef, eventData);
-       toast.success("Event updated successfully");
-       handleOpen();
+       // Unsubscribe from the listener when the component unmounts
+       return () => unsubscribe();
      } catch (error) {
-       console.log(error);
+       setLoading(false);
      }
+   }, [id]);
+
+   // Function to handle block status change for a user
+   const handleUserBlockStatusChange = async (userID, block) => {
+     // Update the local state
+     const updatedUsers = users.map((user) => {
+       if (user.id === userID) {
+         return { ...user, block };
+       }
+       return user;
+     });
+     setUsers(updatedUsers);
+
+     // Update the database with the new blocked status
+     updateUserBlockStatus(userID, block);
    };
-
-
-  useEffect(() => {
-    setLoading(true);
-
-    try {
-      const docRef = doc(db, "events", id);
-
-      const unsubscribe = onSnapshot(docRef, (docSnap) => {
-        if (docSnap.exists()) {
-          console.log("Document data:", docSnap.data());
-          setEvent(docSnap.data());
-          setLoading(false);
-        } else {
-          // doc.data() will be undefined in this case
-          console.log("No such document!");
-
-          setLoading(false);
-          toast.error(
-            "Unable to provide data check your internet connection and try again"
-          );
-        }
-      });
-    } catch (error) {
-      setLoading(false);
-    }
-  }, [id]);
 
   const editHandler = async (e) => {
     e.preventDefault();
     console.log("Edit");
-    // try {
-    //   const docRef = doc(db, "events", event.id);
-    //   const eventData = {
-    //     id: event.id,
-
-    //     title: event.title,
-    //     description: event.description,
-    //     startDate: event.startDate,
-    //     venue: event.venue,
-    //     imageUrl: event.imageUrl,
-    //     endDate: event.endDate,
-    //     link:event.link,
-    //   };
-    //   await setDoc(docRef, eventData);
-    //   toast.success("User updated successfully");
-    //   handleOpen();
-    // } catch (error) {
-    //   console.log(error);
-    // }
 
     try {
       const docRef = doc(db, "events", event.id);
@@ -168,59 +124,125 @@ const handleUserUpdate = (snapshot) => {
     }
   };
 
-
-  
-  
-    const [searchQuery, setSearchQuery] = useState("");
-    const [blockAll, setBlockAll] = useState(false);
-    const [sortOption, setSortOption] = useState("all"); // 'all', 'blocked', or 'unblocked'
-    const [sortOrder, setSortOrder] = useState("asc");
-
-    useEffect(() => {
-      const fetchUsers = async () => {
-        setLoading(true);
-        try {
-          const querySnapshot = await getDocs(collection(db, "users"));
-          const usersData = querySnapshot.docs.map((doc) => doc.data());
-          setUsers(usersData);
-          setLoading(false);
-          console.log(usersData);
-        } catch (error) {
-          console.log(error);
-          setLoading(false);
-        }
-      };
-
-      fetchUsers();
-    }, []);
-
-    const handleSortChange = () => {
-      // Toggle the sorting order when this function is called
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setLoading(true);
+      try {
+        const querySnapshot = await getDocs(collection(db, "users"));
+        const usersData = querySnapshot.docs.map((doc) => doc.data());
+        setUsers(usersData);
+        setLoading(false);
+        console.log(usersData);
+      } catch (error) {
+        console.log(error);
+        setLoading(false);
+      }
     };
 
-    
+    fetchUsers();
+  }, []);
 
-    const filteredUsers = users.filter((user) =>
-      user.fullName.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+  const handleSortChange = () => {
+    // Toggle the sorting order when this function is called
+    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+  };
 
-    const sortedUsers = filteredUsers.slice().sort((a, b) => {
-      // Filter users based on the 'sortOption' state
-      if (sortOption === "blocked" && a.block !== b.block) {
-        return a.block ? -1 : 1;
-      } else if (sortOption === "unblocked" && a.block !== b.block) {
-        return a.block ? 1 : -1;
+  const filteredUsers = users.filter((user) =>
+    user.fullName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const sortedUsers = filteredUsers.slice().sort((a, b) => {
+    // Filter users based on the 'sortOption' state
+    if (sortOption === "blocked" || sortOption === "unblocked") {
+      if (a.block !== b.block) {
+        return sortOption === "blocked" ? (a.block ? -1 : 1) : a.block ? 1 : -1;
       }
+    }
 
-      // If 'sortOption' is 'all' or both users have the same 'block' status, sort based on 'sortOrder'
-      if (sortOrder === "asc") {
-        return a.block - b.block;
-      } else {
-        return b.block - a.block;
-      }
-    });
+    // If 'sortOption' is 'all' or both users have the same 'block' status, sort based on 'sortOrder'
+    if (sortOrder === "asc") {
+      return a.block - b.block;
+    } else {
+      return b.block - a.block;
+    }
+  });
 
+ 
+const handleUserCheckboxChange = async (userID, block) => {
+  // Update the local state
+  const updatedUsers = users.map((user) => {
+    if (user.id === userID) {
+      return { ...user, block };
+    }
+    return user;
+  });
+  setUsers(updatedUsers);
+
+  // Update the database with the new blocked status
+  updateUserBlockStatus(userID, block);
+};
+ // Add a handler function to toggle the "Block All" checkbox
+ const handleBlockAllToggle = () => {
+   // Toggle the value of 'blockAll' state
+   setBlockAll(!blockAll);
+
+   // If 'blockAll' is false, we unblock all users, else we block all users
+   const updatedUsers = users.map((user) => ({
+     ...user,
+     block: !blockAll,
+   }));
+
+   // Update the 'users' state with the new user data
+   setUsers(updatedUsers);
+
+   // Update the database with the new blocked status for all users
+   users.forEach((user) => {
+     updateUserBlockStatus(user.id, !blockAll);
+   });
+ };
+ // Update the 'blocked_members' field whenever users change
+ useEffect(() => {
+   if (event) {
+     const blockedMembers = users
+       .filter((user) => user.block)
+       .map((user) => user.id);
+
+     // Update the 'blocked_members' field in the 'events' document
+     const docRef = doc(db, "events", event.id);
+     try {
+       setDoc(docRef, { blocked_members: blockedMembers }, { merge: true });
+       toast.success("Blocked members updated successfully");
+     } catch (error) {
+       console.log(error);
+       toast.error("Failed to update blocked members");
+     }
+   }
+ }, [users, event]);
+
+ // Function to update the 'blocked_members' field in the 'events' document
+ const updateBlockedMembers = async (eventID, blockedMembers) => {
+   const docRef = doc(db, "events", eventID);
+
+   try {
+     await setDoc(docRef, { blocked_members: blockedMembers }, { merge: true });
+     toast.success("Blocked members updated successfully");
+   } catch (error) {
+     console.log(error);
+     toast.error("Failed to update blocked members");
+   }
+ };
+
+ // Function to update the 'block' field in the 'users' document
+ const updateUserBlockStatus = async (userID, block) => {
+   const userRef = doc(db, "users", userID);
+   try {
+     await setDoc(userRef, { block }, { merge: true });
+     toast.success("User blocked status updated successfully");
+   } catch (error) {
+     console.log(error);
+     toast.error("Failed to update user blocked status");
+   }
+ };
   return (
     <div>
       <div className="p-8 ">{/* Other code... */}</div>
@@ -312,7 +334,6 @@ const handleUserUpdate = (snapshot) => {
                         <option value="unblocked">Unblocked</option>
                       </select>
                     </div>
-                    
                     <div className="flex justify-end  items-center">
                       <span className="px-2">Search</span>
                       <input
@@ -323,11 +344,13 @@ const handleUserUpdate = (snapshot) => {
                         onChange={(e) => setSearchQuery(e.target.value)}
                       />
                     </div>
-                    <div className="flex justify-end  items-center">
-                      <span className="px-2">Block all</span>
+                    <div className="flex items-center space-x-2">
                       <input
                         type="checkbox"
-                         />
+                        ref={blockAllCheckboxRef}
+                        onChange={handleBlockAllToggle}
+                      />
+                      <label htmlFor="blockAll">Block All</label>
                     </div>
                   </div>
 
@@ -423,21 +446,18 @@ const handleUserUpdate = (snapshot) => {
                                 </Typography>
                               </td>
                               <td className="p-4">
-                                <form>
-                                  <input
-                                    type="checkbox"
-                                    name=""
-                                    id=""
-                                    checked={user.block || false}
-                                    onChange={(e) =>
-                                      handleBlockChange(
-                                        user.id,
-                                        e.target.checked
-                                      )
-                                    }
-                                  />
-                                </form>
+                                <input
+                                  type="checkbox"
+                                  checked={user.block}
+                                  onChange={() =>
+                                    handleUserCheckboxChange(
+                                      user.id,
+                                      !user.block
+                                    )
+                                  }
+                                />
                               </td>
+
                               <td className="p-4">
                                 <h2 className="text-blue-500">
                                   <Link
