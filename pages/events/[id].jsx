@@ -142,17 +142,16 @@ const EventDetail = () => {
     fetchUsers();
   }, []);
 
-  const handleSortChange = () => {
-    // Toggle the sorting order when this function is called
-    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-  };
+const handleSortChange = (e) => {
+  // Toggle the sorting option when this function is called
+  setSortOption(e.target.value);
+};
 
   const filteredUsers = users.filter((user) =>
     user.fullName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const sortedUsers = filteredUsers.slice().sort((a, b) => {
-    // Filter users based on the 'sortOption' state
     if (sortOption === "blocked" || sortOption === "unblocked") {
       if (a.block !== b.block) {
         return sortOption === "blocked" ? (a.block ? -1 : 1) : a.block ? 1 : -1;
@@ -166,7 +165,6 @@ const EventDetail = () => {
       return b.block - a.block;
     }
   });
-
  
 const handleUserCheckboxChange = async (userID, block) => {
   // Update the local state
@@ -328,12 +326,17 @@ const handleUserCheckboxChange = async (userID, block) => {
                     </div>
                     <div className="flex justify-end items-center">
                       <span className="px-2">Sort by block</span>
-                      <select className="rounded-md border-gray-500 py-2 px-8 border-2">
+                      <select
+                        className="rounded-md border-gray-500 py-2 px-8 border-2"
+                        value={sortOption}
+                        onChange={handleSortChange}
+                      >
                         <option value="all">All</option>
                         <option value="blocked">Blocked</option>
                         <option value="unblocked">Unblocked</option>
                       </select>
                     </div>
+
                     <div className="flex justify-end  items-center">
                       <span className="px-2">Search</span>
                       <input
