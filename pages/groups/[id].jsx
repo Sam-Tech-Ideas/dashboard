@@ -78,29 +78,27 @@ const GroupDetail = () => {
 
 
  
-  const editHandler = async (e) => {
-    e.preventDefault();
-    console.log("Edit");
-    try {
-      const docRef = doc(db, "groups", group.id);
-      const groupData = {
-        id: group.id,
-        name: group.name,
-        description: group.description,
-        date: group.date,
-        meetingDays: group.meetingDays,
-        members: group.members,
-        groupLeader: group.groupLeader,
-
-
-      };
-      await setDoc(docRef, userData);
-      toast.success("User updated successfully");
-      handleOpen();
-    } catch (error) {
-      console.log(error);
-    }
-  };
+   const editHandler = async (e) => {
+     e.preventDefault();
+     console.log("Edit");
+     try {
+       const docRef = doc(db, "groups", group.id);
+       const groupData = {
+         id: group.id,
+         name: group.name,
+         description: group.description,
+         date: group.date,
+         meetingDays: group.meetingDays,
+         members: group.members,
+         groupLeader: group.groupLeader,
+       };
+       await setDoc(docRef, groupData); // Fixed the variable name here
+       toast.success("Group updated successfully"); // Display toast after successful update
+       handleOpen(); // Close the dialog after successful update
+     } catch (error) {
+       console.log(error);
+     }
+   };
 
 
  
@@ -167,18 +165,13 @@ const GroupDetail = () => {
             <dt class="text-sm font-medium leading-6 text-gray-900">
               Group Leader
             </dt>
-            <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-        
-            </dd>
+            <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0"></dd>
           </div>
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dt class="text-sm font-medium leading-6 text-gray-900">
               Group Members
             </dt>
-            <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-            
-             
-            </dd>
+            <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0"></dd>
           </div>
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dt class="text-sm font-medium leading-6 text-gray-900">''</dt>
@@ -243,6 +236,7 @@ const GroupDetail = () => {
 
       {/* Render the modal component */}
       <Dialog open={open} handler={handleOpen}>
+        
         <DialogHeader>Edit Group</DialogHeader>
         <DialogBody divider>
           <form onSubmit={editHandler}>
@@ -274,7 +268,7 @@ const GroupDetail = () => {
                 />
               </label>
 
-              <label className="block">
+              {/* <label className="block">
                 <span className="text-gray-700">Meeting Days</span>
                 <Input
                   type="text"
@@ -287,7 +281,7 @@ const GroupDetail = () => {
                   }
                   className="block w-full mt-1 form-input"
                 />
-              </label>
+              </label> */}
             </div>
 
             <div className="flex justify-end mt-6">
