@@ -32,9 +32,8 @@ const AddGroup = () => {
     groupImage: "",
 
     groupLeader: "",
-    meetingDays:[""],
+    meetingDays: [""],
     members: [""],
-
   });
 
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -72,12 +71,9 @@ const AddGroup = () => {
 
   const handleAddGroup = async (e) => {
     e.preventDefault();
-   // console.log(Group);
 
     try {
       const docRef = doc(db, "groups", group.id); // Replace `group.id` with the actual document ID
-
- 
 
       const groupData = {
         id: group.id,
@@ -88,11 +84,6 @@ const AddGroup = () => {
         groupLeader: group.groupLeader,
         meetingDays: group.meetingDays,
         members: group.members,
-
-
-
-
-      
       };
 
       await setDoc(docRef, groupData);
@@ -154,7 +145,7 @@ const AddGroup = () => {
                   name="description"
                 />
               </div>
-             
+
               {/* <div className="m-2">
                 <label htmlFor="">Event date(end date)</label>
                 <input
@@ -191,9 +182,6 @@ const AddGroup = () => {
                   />
                 )}
               </div>
-
-
-             
 
               <div className="flex justify-between m-4">
                 <button
