@@ -16,9 +16,10 @@ import {
   serverTimestamp,
   setDoc,
 } from "firebase/firestore";
-import { db, storage } from "@/firebase/config";
+//import { db, storage } from "@/firebase/config";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { nanoid } from "nanoid";
+import { db, storage } from "@/firebase/config";
 
 const AddGroup = () => {
   const [open, setOpen] = useState(false);
@@ -40,7 +41,7 @@ const AddGroup = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setGroup({ ...Group, [name]: value });
+    setGroup({ ...group, [name]: value });
   };
 
   const handleImageChange = (e) => {
@@ -62,7 +63,7 @@ const AddGroup = () => {
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setGroup({ ...Group, groupImage: downloadURL });
+          setGroup({ ...group, groupImage: downloadURL });
           alert("Image uploaded successfully");
         });
       }
@@ -70,8 +71,8 @@ const AddGroup = () => {
   };
 
   const handleAddGroup = async (e) => {
-    //e.prGroupDefault();
-    console.log(Group);
+    e.preventDefault();
+   // console.log(Group);
 
     try {
       const docRef = doc(db, "groups", group.id); // Replace `group.id` with the actual document ID
