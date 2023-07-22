@@ -8,6 +8,7 @@ import {
   Typography,
   Avatar,
 } from "@material-tailwind/react";
+import Link from "next/link";
 
 const Groups = () => {
   const [groups, setGroups] = useState([]);
@@ -42,6 +43,7 @@ const Groups = () => {
           <div className="flex flex-wrap -m-4">
             {groups.map((group) => (
               <div key={group.id} className="xl:w-1/4 md:w-1/2 p-4">
+                <Link href={`/groups/${group.id}`}>
                 <Card
                   shadow={false}
                   className="relative grid h-[20rem] w-full max-w-[48rem] items-end justify-center overflow-hidden text-center"
@@ -78,6 +80,7 @@ const Groups = () => {
                     </Typography>
                   </CardBody>
                 </Card>
+                </Link>
               </div>
             ))}
           </div>
