@@ -99,13 +99,26 @@ const Customers = () => {
     }
   });
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const usersPerPage = 10;
+
+    // Function to get the index of the first and last user of the current page
+    const indexOfLastUser = currentPage * usersPerPage;
+    const indexOfFirstUser = indexOfLastUser - usersPerPage;
+    const currentUsers = sortedUsers.slice(indexOfFirstUser, indexOfLastUser);
+
+    // Function to handle page change
+    const handlePageChange = (pageNumber) => {
+      setCurrentPage(pageNumber);
+    };
+
   return (
     <div className="">
       <div className="m-8 flex items-center justify-between">
         <div>
           <h2 className="text-3xl">All users</h2>
         </div>
-        <div className="flex justify-end items-center">
+        {/* <div className="flex justify-end items-center">
           <span className="px-2">Sort by block</span>
           <select
             className="rounded-md border-gray-500 py-2 px-8 border-2"
@@ -116,7 +129,7 @@ const Customers = () => {
             <option value="blocked">Blocked</option>
             <option value="unblocked">Unblocked</option>
           </select>
-        </div>
+        </div> */}
         <div className="flex justify-end  items-center">
           <span className="px-2">Search</span>
           <input
@@ -127,14 +140,14 @@ const Customers = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <div className="flex justify-end  items-center">
+        {/* <div className="flex justify-end  items-center">
           <span className="px-2">Block all</span>
           <input
             type="checkbox"
             checked={blockAll}
             onChange={handleBlockAllChange}
           />
-        </div>
+        </div> */}
       </div>
 
       <Card className="overflow-scroll h-full w-full">
@@ -171,7 +184,7 @@ const Customers = () => {
                   Role
                 </Typography>
               </th>
-              <th className="border-b border-blue-gray-100 bg-blue-gray-50 p-4">
+              {/* <th className="border-b border-blue-gray-100 bg-blue-gray-50 p-4">
                 <Typography
                   variant="small"
                   color="blue-gray"
@@ -179,7 +192,7 @@ const Customers = () => {
                 >
                   Block action
                 </Typography>
-              </th>
+              </th> */}
               <th className="border-b border-blue-gray-100 bg-blue-gray-50 p-4">
                 <Typography
                   variant="small"
@@ -198,8 +211,8 @@ const Customers = () => {
                   Loading...
                 </td>
               </tr>
-            ) : sortedUsers.length > 0 ? (
-              sortedUsers.map((user) => (
+            ) : currentUsers.length > 0 ? (
+              currentUsers.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-300">
                   <td className="p-4">
                     <Typography
@@ -228,8 +241,8 @@ const Customers = () => {
                       {user.profileType}
                     </Typography>
                   </td>
-                  <td className="p-4">
-                    <form>
+                  {/*  <td className="p-4">
+                   <form>
                       <input
                         type="checkbox"
                         name=""
@@ -239,8 +252,8 @@ const Customers = () => {
                           handleBlockChange(user.id, e.target.checked)
                         }
                       />
-                    </form>
-                  </td>
+                    </form> 
+                      </td>*/}
                   <td className="p-4">
                     <h2 className="text-blue-500">
                       <Link href="/users/[id]" as={`/users/${user.id}`}>
@@ -260,6 +273,25 @@ const Customers = () => {
           </tbody>
         </table>
       </Card>
+
+      <div className="flex justify-center mt-4">
+        {Array.from(
+          { length: Math.ceil(sortedUsers.length / usersPerPage) },
+          (_, index) => (
+            <button
+              key={index}
+              className={`px-4 py-2 mx-2 text-sm font-medium rounded-md ${
+                currentPage === index + 1
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-300 text-gray-700"
+              }`}
+              onClick={() => handlePageChange(index + 1)}
+            >
+              {index + 1}
+            </button>
+          )
+        )}
+      </div>
     </div>
   );
 };
