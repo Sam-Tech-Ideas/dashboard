@@ -115,7 +115,21 @@ const GivingsList = () => {
       formatDate(giving.date_paid),
     ]),
   ];
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 20;
 
+  // Function to get the index of the first and last record of the current page
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const currentRecords = filteredGivings.slice(
+    indexOfFirstRecord,
+    indexOfLastRecord
+  );
+
+  // Function to handle page change
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
   return (
     <>
       <div className="shadow-sm bg-white">
@@ -215,7 +229,7 @@ const GivingsList = () => {
                     </td>
                   </tr>
                 ) : (
-                  filteredGivings.map((giving) => (
+                  currentRecords.map((giving) => (
                     <tr
                       key={giving.id}
                       className="bg-gray-200 text-center hover:bg-gray-100/50"
@@ -237,6 +251,27 @@ const GivingsList = () => {
             </table>
           )}
         </div>
+
+        {filteredGivings.length > recordsPerPage && (
+          <div className="flex justify-center mt-4">
+            {Array.from(
+              { length: Math.ceil(filteredGivings.length / recordsPerPage) },
+              (_, index) => (
+                <button
+                  key={index}
+                  className={`px-4 py-2 mx-2 text-sm font-medium rounded-md ${
+                    currentPage === index + 1
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-300 text-gray-700"
+                  }`}
+                  onClick={() => handlePageChange(index + 1)}
+                >
+                  {index + 1}
+                </button>
+              )
+            )}
+          </div>
+        )}
       </div>
     </>
   );
