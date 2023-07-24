@@ -241,6 +241,43 @@ const handleUserCheckboxChange = async (userID, block) => {
      toast.error("Failed to update user blocked status");
    }
  };
+
+
+ const handleStartEvent = async () => {
+    const docRef = doc(db, "events", event.id);
+    try {
+      await setDoc(docRef, { status: "started" }, { merge: true });
+      toast.success("Event started successfully");
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to start event");
+    }
+  };
+
+  const handleEndEvent = async () => {
+    const docRef = doc(db, "events", event.id);
+    try {
+      await setDoc(docRef, { status: "ended" }, { merge: true });
+      toast.success("Event ended successfully");
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to end event");
+    }
+  };
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 10;
+
+  // Function to get the index of the first and last user of the current page
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = sortedUsers.slice(indexOfFirstUser, indexOfLastUser);
+
+  // Function to handle page change
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   return (
     <div>
       <div className="p-8 ">{/* Other code... */}</div>
@@ -301,7 +338,7 @@ const handleUserCheckboxChange = async (userID, block) => {
                     new Date(event.startDate.toDate()).toLocaleString()}
                 </dd>
               </div>
-              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+              {/* <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                 <dt className="text-sm font-medium leading-6 text-gray-900">
                   Allowed Members
                 </dt>
@@ -315,7 +352,30 @@ const handleUserCheckboxChange = async (userID, block) => {
                       </div>
                     ))}
                 </dd>
+              </div> */}
+              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt className="text-sm font-medium leading-6 text-gray-900">
+                  Event Status
+                </dt>
+                <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                  {event.status === "started" ? (
+                    <button
+                      className="bg-red-600 text-white px-4 py-2 rounded-lg "
+                      onClick={handleEndEvent}
+                    >
+                      End Event
+                    </button>
+                  ) : (
+                    <button
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg "
+                      onClick={handleStartEvent}
+                    >
+                      Start Event
+                    </button>
+                  )}
+                </dd>
               </div>
+
               <div>
                 <h1 className="text-2xl">Block Users</h1>
                 <p></p>
@@ -418,8 +478,8 @@ const handleUserCheckboxChange = async (userID, block) => {
                               Loading...
                             </td>
                           </tr>
-                        ) : sortedUsers.length > 0 ? (
-                          sortedUsers.map((user) => (
+                        ) : currentUsers.length > 0 ? (
+                          currentUsers.map((user) => (
                             <tr key={user.id} className="hover:bg-gray-300">
                               <td className="p-4">
                                 <Typography
@@ -488,6 +548,43 @@ const handleUserCheckboxChange = async (userID, block) => {
             </dl>
           </div>
         )}
+      </div>
+      <div className="flex justify-center mt-4">
+        {Array.from(
+          { length: Math.ceil(sortedUsers.length / usersPerPage) },
+          (_, index) => (
+            <button
+              key={index}
+              className={`px-4 py-2 mx-2 text-sm font-medium rounded-md ${
+                currentPage === index + 1
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-300 text-gray-700"
+              }`}
+              onClick={() => handlePageChange(index + 1)}
+            >
+              {index + 1}
+            </button>
+          )
+        )}
+      </div>
+      <div>
+        <div>
+          <h1 className="text-2xl">Event Attendance</h1>
+          <div className="mt-4">
+            {/**list of attended users */}
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl">Attended Users</h2>
+              <ul>
+                {event &&
+                  event.attended_members &&
+                  event.attended_members.map((user) => (
+                    <li key={user.id}>{user.fullName}</li>
+                  ))}
+                  
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Render the modal component */}
