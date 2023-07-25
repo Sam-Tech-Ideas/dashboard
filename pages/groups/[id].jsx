@@ -174,6 +174,7 @@ useEffect(() => {
          id: group.id,
          name: group.name,
          description: group.description,
+         groupImage: group.groupImage,
          date: group.date,
          meetingDays: group.meetingDays,
          members: group.members,
