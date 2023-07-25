@@ -57,7 +57,7 @@ const Groups = () => {
 
           <div className="flex flex-wrap -m-4">
             {groups.map((group) => (
-              <div key={group.id} className="xl:w-1/4 md:w-1/2 p-4">
+              <div key={group.id} className="xl:w-1/2 md:w-1/2 p-4">
                 <Link href={`/groups/${group.id}`}>
                   <Card
                     shadow={false}
