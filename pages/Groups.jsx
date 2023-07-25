@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/config";
 import {
   Card,
@@ -10,6 +10,7 @@ import {
 } from "@material-tailwind/react";
 import Link from "next/link";
 import AddGroup from "@/components/groups/AddGroup";
+import { toast } from "react-hot-toast";
 
 const Groups = () => {
   const [groups, setGroups] = useState([]);
@@ -23,6 +24,16 @@ const Groups = () => {
     // Cleanup function to unsubscribe from the Firestore listener
     return () => unsubscribe();
   }, []);
+
+
+  const handleDeleteGroup = async (id) => {
+    try {
+      await deleteDoc(doc(db, "groups", id));
+      toast.success("Group deleted successfully");
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
 
   return (
     <>
@@ -77,9 +88,24 @@ const Groups = () => {
                       <Typography variant="h5" className="mb-4 text-gray-400">
                         {group.members.length} Members
                       </Typography>
+
                     </CardBody>
+                    
                   </Card>
-                </Link>
+                  </Link>
+                  <div>
+                    <div className="flex justify-center">
+                      <div className="flex items-center">
+<p className="text-red-500 px-4 py-2 rounded-lg cursor-pointer" onClick={
+  () => handleDeleteGroup(group.id)
+}>
+
+  Delete Group
+</p>
+                        </div>
+                        </div>
+                  </div>
+          
               </div>
             ))}
           </div>
