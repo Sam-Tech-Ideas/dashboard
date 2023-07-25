@@ -60,7 +60,7 @@ const GroupDetail = () => {
           const storageRef = ref(
 
             storage,
-            `groupImages/${Date.now()}${file.name}`
+            `Grimages/${Date.now()}${file.name}`
           );
           const uploadTask = uploadBytesResumable(storageRef, file);
             
