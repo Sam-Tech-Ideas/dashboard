@@ -30,7 +30,7 @@ import {
 import { Bar } from "react-chartjs-2";
 import { Group } from "lucide-react";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-
+import { nanoid } from "nanoid";
 
 const GroupDetail = () => {
   const [group, setGroup] = useState(null);
@@ -40,94 +40,149 @@ const GroupDetail = () => {
 
   const [uploadProgress, setUploadProgress] = useState(0);
 
-
   const [open, setOpen] = useState(false);
+  const [subopen, setSubOpen] = useState(false);
 
   const handleOpen = () => setOpen(!open);
+  const handleSubOpen = () => setSubOpen(!subopen);
   const router = useRouter();
   const { id } = router.query;
-       const [groupLeader, setGroupLeader] = useState(null);
+  const [groupLeader, setGroupLeader] = useState(null);
+  
+  //const [subgroup, setSubgroup] = useState(null);
+  const [subgroup, setSubgroup] = useState({
+    id: nanoid(),
+    name: "",
+    description: "",
+    groupImage: "",
 
+    groupLeader: "",
+    meetingDays: [""],
+    members: [""],
+  });
 
-       {/**editing groupImage */}
-        const handleImageChange = (e) => {
-          const file = e.target.files[0];
-          console.log(file);
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    console.log(file);
 
+    const storageRef = ref(storage, `Grimages/${Date.now()}${file.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
 
-
-
-          const storageRef = ref(
-
-            storage,
-            `Grimages/${Date.now()}${file.name}`
-          );
-          const uploadTask = uploadBytesResumable(storageRef, file);
-            
-          uploadTask.on(
-            "state_changed",
-            (snapshot) => {
-              const progress =
-
-                (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-              setUploadProgress(progress);
-            },
-            (error) => {
-              alert(error.message);
-            },
-            () => {
-              getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                console.log("File available at", downloadURL);
-                setGroup({ ...group, groupImage: downloadURL });
-              });
-            }
-          );
-        };
-
-
- useEffect(() => {
-   if (group && group.groupLeader) {
-     const fetchGroupLeader = async () => {
-       try {
-         const groupLeaderDoc = await getDoc(
-           doc(db, "users", group.groupLeader)
-         );
-         if (groupLeaderDoc.exists()) {
-           setGroupLeader(groupLeaderDoc.data());
-         }
-       } catch (error) {
-         console.log("Error fetching group leader:", error);
-       }
-     };
-
-     fetchGroupLeader();
-   }
- }, [group]);
-
-
-
-
-useEffect(() => {
-  if (group && group.members) {
-    const fetchGroupMembers = async () => {
-      try {
-        const membersData = [];
-        for (const memberId of group.members) {
-          const memberDoc = await getDoc(doc(db, "users", memberId));
-          if (memberDoc.exists()) {
-            membersData.push(memberDoc.data());
-          }
-        }
-        setGroupMembers(membersData);
-      } catch (error) {
-        console.log("Error fetching group members:", error);
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setUploadProgress(progress);
+      },
+      (error) => {
+        alert(error.message);
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          console.log("File available at", downloadURL);
+          setGroup({ ...group, groupImage: downloadURL });
+        });
       }
-    };
+    );
+  };
 
-    fetchGroupMembers();
-    fetchGroupLeader();
+
+  {/**fetch subgroups */}
+  const [subgroups, setSubgroups] = useState([]);
+const fetchSubgroups = async () => {
+  try {
+    setLoading(true);
+    const q = query(collection(db, "subgroups"), where("group", "==", id));
+
+    // Subscribe to the query using onSnapshot to get real-time updates
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const _subgroups = [];
+      querySnapshot.forEach((doc) => {
+        _subgroups.push({ id: doc.id, ...doc.data() });
+      });
+      setSubgroups(_subgroups);
+      console.log("Subgroups:", _subgroups);
+      setLoading(false);
+    });
+
+    // Return the unsubscribe function to stop listening for updates when needed
+    return () => unsubscribe();
+  } catch (error) {
+    console.log("Error fetching subgroups:", error);
+    setLoading(false);
   }
-}, [group]);
+};
+
+
+  
+  // const handleSubImageChange = (e) => {
+  //   const file = e.target.files[0];
+  //   console.log(file);
+
+  //   const storageRef = ref(storage, `Subimages/${Date.now()}${file.name}`);
+  //   const uploadTask = uploadBytesResumable(storageRef, file);
+
+  //   uploadTask.on(
+  //     "state_changed",
+  //     (snapshot) => {
+  //       const progress =
+  //         (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+  //       setUploadProgress(progress);
+  //     },
+  //     (error) => {
+  //       alert(error.message);
+  //     },
+  //     () => {
+  //       getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+  //         console.log("File available at", downloadURL);
+  //         setGroup({ ...subgroup, groupImage: downloadURL });
+  //       });
+  //     }
+  //   );
+  // };
+
+  useEffect(() => {
+    if (group && group.groupLeader) {
+      const fetchGroupLeader = async () => {
+        try {
+          const groupLeaderDoc = await getDoc(
+            doc(db, "users", group.groupLeader)
+          );
+          if (groupLeaderDoc.exists()) {
+            setGroupLeader(groupLeaderDoc.data());
+          }
+        } catch (error) {
+          console.log("Error fetching group leader:", error);
+        }
+      };
+
+      fetchGroupLeader();
+      fetchSubgroups();
+    }
+  }, [group]);
+
+  useEffect(() => {
+    if (group && group.members) {
+      const fetchGroupMembers = async () => {
+        try {
+          const membersData = [];
+          for (const memberId of group.members) {
+            const memberDoc = await getDoc(doc(db, "users", memberId));
+            if (memberDoc.exists()) {
+              membersData.push(memberDoc.data());
+            }
+          }
+          setGroupMembers(membersData);
+        } catch (error) {
+          console.log("Error fetching group members:", error);
+        }
+      };
+
+      fetchGroupMembers();
+      fetchGroupLeader();
+    }
+  }, [group]);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(doc(db, "groups", id), (doc) => {
@@ -162,35 +217,30 @@ useEffect(() => {
     );
   }
 
+  const editHandler = async (e) => {
+    e.preventDefault();
+    console.log("Edit");
+    try {
+      const docRef = doc(db, "groups", group.id);
+      const groupData = {
+        id: group.id,
+        name: group.name,
+        description: group.description,
+        groupImage: group.groupImage,
+        date: group.date,
+        meetingDays: group.meetingDays,
+        members: group.members,
+        groupLeader: group.groupLeader,
+      };
+      await setDoc(docRef, groupData); // Fixed the variable name here
+      toast.success("Group updated successfully"); // Display toast after successful update
+      handleOpen(); // Close the dialog after successful update
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-
- 
-   const editHandler = async (e) => {
-     e.preventDefault();
-     console.log("Edit");
-     try {
-       const docRef = doc(db, "groups", group.id);
-       const groupData = {
-         id: group.id,
-         name: group.name,
-         description: group.description,
-         groupImage: group.groupImage,
-         date: group.date,
-         meetingDays: group.meetingDays,
-         members: group.members,
-         groupLeader: group.groupLeader,
-       };
-       await setDoc(docRef, groupData); // Fixed the variable name here
-       toast.success("Group updated successfully"); // Display toast after successful update
-       handleOpen(); // Close the dialog after successful update
-     } catch (error) {
-       console.log(error);
-     }
-   };
-
-
-   const handleRemoveFromGroup = async (memberId) => {
-
+  const handleRemoveFromGroup = async (memberId) => {
     try {
       const docRef = doc(db, "groups", group.id);
       const groupData = {
@@ -209,26 +259,50 @@ useEffect(() => {
     }
   };
 
-  {/**fetch group leader */}
-  
-    const fetchGroupLeader = async () => {
-      try {
-         const groupLeaderDoc = await getDoc(doc(db, "users", group.groupLeader));
-          if (groupLeaderDoc.exists()) {
-            setGroupLeader(groupLeaderDoc.data());
-          }
-      } catch (error) {
-        console.log("Error fetching group leader:", error);
+  {
+    /**fetch group leader */
+  }
+
+  const fetchGroupLeader = async () => {
+    try {
+      const groupLeaderDoc = await getDoc(doc(db, "users", group.groupLeader));
+      if (groupLeaderDoc.exists()) {
+        setGroupLeader(groupLeaderDoc.data());
       }
-    };
+    } catch (error) {
+      console.log("Error fetching group leader:", error);
+    }
+  };
+
+  // ... (existing code)
+
+  // Fetch group leader data
+  const handleSubGroupCreate = async (e) => {
+    e.preventDefault();
+    console.log("Subgroup");
+    try {
+      const docRef = doc(db, "subgroups", group.id);
+
+      // Create a new object representing the subgroup data
+      const subgroupData = {
+        id: group.id,
+        name: subgroup.name,
+        description: subgroup.description,
+        groupImage: group.groupImage,
+      };
+
+      await setDoc(docRef, subgroupData);
 
 
-     // ... (existing code)
+      toast.success("Subgroup created successfully");
+      handleSubOpen();
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
+  };
 
-     // Fetch group leader data
-    
-
- 
+  console.log('this is a subgroup', subgroups)
   return (
     <div>
       <div className="">{/* Other code... */}</div>
@@ -385,77 +459,62 @@ useEffect(() => {
                 />
               </label>
 
-<div>
-                <label
-                htmlFor="groupImage"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Group Image
-              </label>
-              <div className="mt-1 flex items-center">
-                <span className="inline-block h-12 w-12 rounded-full overflow-hidden bg-gray-100">
-                  <img
-                    src={group ? group.groupImage : ""}
-                    alt="Group Image"
-                    className="w-full h-full"
-                  />
-                </span>
-                <input
-                  type="file"
-                  name="groupImage"
-                  id="groupImage"
-                  onChange={handleImageChange}
-                  className="sr-only"
-                />
+              <div>
                 <label
                   htmlFor="groupImage"
-                  className="ml-5 bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 inline-flex justify-center text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer"
+                  className="block text-sm font-medium text-gray-700"
                 >
-                  {/* <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-gray-400"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 12a2 2 0 100-4 2 2 0 000 4z"
-                      clipRule="evenodd"
-                    />
-                    <path
-                      fillRule="evenodd"
-                      d="M2 10a8 8 0 1116 0 8 8 0 01-16 0zm8-6a6 6 0 100 12 6 6 0 000-12z"
-                      clipRule="evenodd"
-                    />
-                  </svg>  */}
-                  <span className="ml-2">Change</span> 
+                  Group Image
                 </label>
+                <div className="mt-1 flex items-center">
+                  <span className="inline-block h-12 w-12 rounded-full overflow-hidden bg-gray-100">
+                    <img
+                      src={group ? group.groupImage : ""}
+                      alt="Group Image"
+                      className="w-full h-full"
+                      onChange={(e) =>
+                        setGroup({ ...group, groupImage: e.target.value })
+                      }
+                    />
+                  </span>
+                  <input
+                    type="file"
+                    name="subgroupImage"
+                    id="groupImage"
+                    onChange={handleImageChange}
+                    className="sr-only"
+                  />
+                  <label
+                    htmlFor="groupImage"
+                    className="ml-5 bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 inline-flex justify-center text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer"
+                  >
+                    <span className="ml-2">Change</span>
+                  </label>
 
-                {uploadProgress > 0 && (
-                  <div className="ml-5">
-                    <span className="text-sm font-medium text-gray-900">
-                      Uploading...
-                    </span>
-                  
-                        
+                  {uploadProgress > 0 && (
+                    <div className="ml-5">
+                      <span className="text-sm font-medium text-gray-900">
+                        Uploading...
+                      </span>
+
+                      <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">
+                        {uploadProgress}%
+                      </span>
+
+                      <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-blue-200">
+                        <div
+                          style={{ width: `${uploadProgress}%` }}
+                          className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500"
+                        >
                           <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">
                             {uploadProgress}%
                           </span>
-
-                          <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-blue-200">
-                            <div
-                              style={{ width: `${uploadProgress}%` }}
-                              className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500"
-                            >
-                             <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">
-                                {uploadProgress}%
-                              </span> 
-                            </div>
-                          </div>
-                          </div>
-                )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
             </div>
 
             <div className="flex justify-end mt-6">
@@ -476,6 +535,177 @@ useEffect(() => {
           </form>
         </DialogBody>
       </Dialog>
+      <Dialog open={subopen} handler={handleSubOpen}>
+        <DialogHeader>Create Subgroup</DialogHeader>
+        <DialogBody divider>
+          <form onSubmit={handleSubGroupCreate}>
+            <div className="grid grid-cols-1 gap-6 mt-4">
+              <label className="block">
+                <span className="text-gray-700">Sub-Group Name</span>
+                <Input
+                  type="text"
+                  name="name"
+                  id="name"
+                  required
+                  value={subgroup ? subgroup.name : ""}
+                  onChange={(e) =>
+                    setSubgroup({ ...subgroup, name: e.target.value })
+                  }
+                  className="block w-full mt-1 form-input py-3 border-2 rounded "
+                />
+              </label>
+              <label className="block">
+                <span className="text-gray-700">Group Description</span>
+                <Input
+                  type="text"
+                  name="description"
+                  id="description"
+                  value={subgroup ? subgroup.description : ""}
+                  onChange={(e) =>
+                    setSubgroup({ ...subgroup, description: e.target.value })
+                  }
+                  required
+                  className="block w-full mt-1 form-input"
+                />
+              </label>
+
+              {/* <div>
+                <label
+                  htmlFor="groupImage"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Group Image
+                </label>
+                <div className="mt-1 flex items-center">
+                  <span className="inline-block h-12 w-12 rounded-full overflow-hidden bg-gray-100">
+                    <img
+                      src={subgroup ? subgroup.groupImage : ""}
+                      alt="Group Image"
+                      className="w-full h-full"
+                    />
+                  </span>
+                  <input
+                    type="file"
+                    name="groupImage"
+                    id="groupImage"
+                    onChange={handleSubImageChange}
+                    className="sr-only"
+                  />
+                  <label
+                    htmlFor="groupImage"
+                    className="ml-5 bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 inline-flex justify-center text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer"
+                  >
+                    <span className="ml-2">Change</span>
+                  </label>
+
+                  {uploadProgress > 0 && (
+                    <div className="ml-5">
+                      <span className="text-sm font-medium text-gray-900">
+                        Uploading...
+                      </span>
+
+                      <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">
+                        {uploadProgress}%
+                      </span>
+
+                      <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-blue-200">
+                        <div
+                          style={{ width: `${uploadProgress}%` }}
+                          className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500"
+                        >
+                          <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">
+                            {uploadProgress}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div> */}
+            </div>
+
+            <div className="flex justify-end mt-6">
+              <button
+                type="button"
+                onClick={handleSubOpen}
+                className="px-4 py-2 text-sm font-medium text-gray-700 transition-colors duration-150 bg-gray-200 border border-transparent rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 ml-4 text-sm font-medium text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </DialogBody>
+      </Dialog>
+
+      <div className="p-8">
+        <button
+          className="bg-blue-500 px-6 py-2 text-white rounded"
+          onClick={handleSubOpen}
+        >
+          Create Sub Group
+        </button>
+
+        <div className="mt-4">
+          <div className="overflow-hidden bg-white shadow sm:rounded-md">
+            <div className="px-4 py-5 sm:p-6">
+              <h3 className="text-lg font-medium leading-6 text-gray-900">
+                Sub Groups List
+              </h3>
+              <div className="mt-2 max-w-xl text-sm text-gray-500">
+                <ul>
+                  {
+                    subgroups.map((subgroup) => (
+                      <li key={subgroup.id} className="flex justify-between">
+                        <div className="flex">
+                          <div className="flex-shrink-0">
+                            <img
+                              className="h-10 w-10 rounded-full"
+                              src={subgroup.groupImage}
+                              alt=""
+                            />
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">
+                              {subgroup.name}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {subgroup.description}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex">
+                          <button
+                            className="bg-blue-500 px-6 py-2 text-white rounded"
+                            onClick={() => handleSubEdit(subgroup)}
+                          >
+                            Edit
+                          </button>
+                          <button
+
+                            className="bg-red-500 px-6 py-2 text-white rounded ml-4"
+                            onClick={() => handleSubDelete(subgroup.id)}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </li>
+                    ))
+
+                  }
+
+                  </ul>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
