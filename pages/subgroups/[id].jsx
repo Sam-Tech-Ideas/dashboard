@@ -28,13 +28,12 @@ import {
   Input,
   Card,
 } from "@material-tailwind/react";
-import { Bar } from "react-chartjs-2";
-import { Group } from "lucide-react";
+
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { nanoid } from "nanoid";
 import Link from "next/link";
 
-const GroupDetail = () => {
+const SubGroupDetail = () => {
   const [group, setGroup] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -116,11 +115,15 @@ const GroupDetail = () => {
   // ... (existing code)
 
   // Fetch subgroups related to this group
-  useEffect(() => {
+useEffect(() => {
+  if (group && group.id) {
     const fetchSubgroups = async () => {
       try {
         // Create a query to get subgroups where the "id" field matches the current group's ID
-        const q = query(collection(db, "subgroups"), where("id", "==", id));
+        const q = query(
+          collection(db, "subgroups"),
+          where("id", "==", group.id)
+        );
 
         // Get the documents that match the query
         const querySnapshot = await getDocs(q);
@@ -137,8 +140,8 @@ const GroupDetail = () => {
     };
 
     fetchSubgroups();
-  }, [id]);
-
+  }
+}, [group]);
   // ... (existing code)
 
   useEffect(() => {
@@ -164,7 +167,7 @@ const GroupDetail = () => {
   }, [group]);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(doc(db, "groups", id), (doc) => {
+    const unsubscribe = onSnapshot(doc(db, "subgroups", id), (doc) => {
       if (doc.exists()) {
         setGroup(doc.data());
       } else {
@@ -200,16 +203,12 @@ const GroupDetail = () => {
     e.preventDefault();
     console.log("Edit");
     try {
-      const docRef = doc(db, "groups", group.id);
+      const docRef = doc(db, "subgroups", group.id);
       const groupData = {
         id: group.id,
         name: group.name,
         description: group.description,
         groupImage: group.groupImage,
-        date: group.date,
-        meetingDays: group.meetingDays,
-        members: group.members,
-        groupLeader: group.groupLeader,
       };
       await setDoc(docRef, groupData); // Fixed the variable name here
       toast.success("Group updated successfully"); // Display toast after successful update
@@ -221,7 +220,7 @@ const GroupDetail = () => {
 
   const handleRemoveFromGroup = async (memberId) => {
     try {
-      const docRef = doc(db, "groups", group.id);
+      const docRef = doc(db, "subgroups", group.id);
       const groupData = {
         id: group.id,
         name: group.name,
@@ -621,12 +620,12 @@ const GroupDetail = () => {
       </Dialog>
 
       <div className="p-8">
-        <button
+        {/* <button
           className="bg-blue-500 px-6 py-2 text-white rounded"
           onClick={handleSubOpen}
         >
           Create Sub Group
-        </button>
+        </button> */}
 
         <div className="mt-4">
           <div className="overflow-hidden bg-white shadow sm:rounded-md">
@@ -635,28 +634,28 @@ const GroupDetail = () => {
                 Sub Groups List
               </h3>
               <div className="mt-2 max-w-xl text-sm text-gray-500">
-                <ul>
+                {/* <ul>
                   {subgroups.map((subgroup) => (
                     <Link href={`/subgroups/${subgroup.id}`}>
-                    <li key={subgroup.id} className="flex justify-between">
-                      <div className="flex">
-                        <div className="flex-shrink-0">
-                          <img
-                            className="h-10 w-10 rounded-full"
-                            src={subgroup.groupImage}
-                            alt=""
-                          />
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
-                            {subgroup.name}
+                      <li key={subgroup.id} className="flex justify-between">
+                        <div className="flex">
+                          <div className="flex-shrink-0">
+                            <img
+                              className="h-10 w-10 rounded-full"
+                              src={subgroup.groupImage}
+                              alt=""
+                            />
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">
+                              {subgroup.name}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </li>
+                      </li>
                     </Link>
                   ))}
-                </ul>
+                </ul> */}
               </div>
             </div>
           </div>
@@ -666,4 +665,4 @@ const GroupDetail = () => {
   );
 };
 
-export default GroupDetail;
+export default SubGroupDetail;
