@@ -33,7 +33,8 @@ const AddMessage = () => {
   });
 useEffect(() => {
   
-  const unsubscribe = onSnapshot(collection(db, "devices"), (snapshot) => {
+  
+  const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
     const tokens = [];
     snapshot.forEach((doc) => {
       const specificField = doc.data().fcmToken;

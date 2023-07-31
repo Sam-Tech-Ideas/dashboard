@@ -8,16 +8,31 @@ import {
 } from "firebase/firestore";
 import { Card, Typography } from "@material-tailwind/react";
 import Link from "next/link.js";
-import { db } from "@/firebase/config.js";
+import { auth, db } from "@/firebase/config.js";
+
+import {
+  Button,
+  Dialog,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+} from "@material-tailwind/react";
+import { CheckIcon } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 const Customers = () => {
   const [users, setUsers] = useState([]);
+  const [user, setUser] = useState([]);
+  const [email, setEmail] = useState([]);
+  const [fullName, setFullName] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [blockAll, setBlockAll] = useState(false);
   const [sortOption, setSortOption] = useState("all"); // 'all', 'blocked', or 'unblocked'
   const [sortOrder, setSortOrder] = useState("asc");
-
+ 
+  const password = "cosmic123"; //password for all users
   useEffect(() => {
     const fetchUsers = async () => {
       setLoading(true);
@@ -35,6 +50,10 @@ const Customers = () => {
 
     fetchUsers();
   }, []);
+
+  const [open, setOpen] = React.useState(false);
+
+  const handleOpen = () => setOpen(!open);
 
   const handleSortChange = () => {
     // Toggle the sorting order when this function is called
@@ -99,18 +118,40 @@ const Customers = () => {
     }
   });
 
-    const [currentPage, setCurrentPage] = useState(1);
-    const usersPerPage = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 10;
 
-    // Function to get the index of the first and last user of the current page
-    const indexOfLastUser = currentPage * usersPerPage;
-    const indexOfFirstUser = indexOfLastUser - usersPerPage;
-    const currentUsers = sortedUsers.slice(indexOfFirstUser, indexOfLastUser);
+  // Function to get the index of the first and last user of the current page
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = sortedUsers.slice(indexOfFirstUser, indexOfLastUser);
 
-    // Function to handle page change
-    const handlePageChange = (pageNumber) => {
-      setCurrentPage(pageNumber);
-    };
+  // Function to handle page change
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  //authenticating user and storing in user database
+  const addUser = async () => {
+     try{
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+        await db.collection("users").doc(user.uid).set({
+          fullName: fullName,
+          email: email,
+          block: false,
+          id: user.uid,
+        });
+        console.log("user added");
+     }
+     catch(error){
+       console.log(error)
+       toast.error(error.message);
+     }
+
+
+    handleOpen();
+  };
 
   return (
     <div className="">
@@ -118,6 +159,7 @@ const Customers = () => {
         <div>
           <h2 className="text-3xl">All users</h2>
         </div>
+
         {/* <div className="flex justify-end items-center">
           <span className="px-2">Sort by block</span>
           <select
@@ -131,6 +173,13 @@ const Customers = () => {
           </select>
         </div> */}
         <div className="flex justify-end  items-center">
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            onClick={addUser}
+          >
+            add user
+          </button>
+
           <span className="px-2">Search</span>
           <input
             type="text"
@@ -143,7 +192,7 @@ const Customers = () => {
         {/* <div className="flex justify-end  items-center">
           <span className="px-2">Block all</span>
           <input
-            type="checkbox"
+            type="checkbLinkox"
             checked={blockAll}
             onChange={handleBlockAllChange}
           />
@@ -292,6 +341,47 @@ const Customers = () => {
           )
         )}
       </div>
+
+      <>
+        <Dialog open={open} handler={handleOpen}>
+          <DialogHeader>Creating a new user</DialogHeader>
+          <DialogBody>
+            <form>
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2">
+                  Email address
+                </label>
+                <input
+                  type="email"
+                  className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+                />
+              </div>
+            </form>
+          </DialogBody>
+          <DialogFooter>
+            <Button
+              variant="text"
+              color="red"
+              onClick={handleOpen}
+              className="mr-1"
+            >
+              <span>Cancel</span>
+            </Button>
+            <Button variant="gradient" color="green" onClick={handleOpen}>
+              <span>Create</span>
+            </Button>
+          </DialogFooter>
+        </Dialog>
+      </>
     </div>
   );
 };

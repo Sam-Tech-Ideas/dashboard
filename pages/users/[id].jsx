@@ -300,6 +300,10 @@ const totalGivingsByType = calculateTotalGivingsByType();
           </dl>
         )}
       </div>
+
+      {/*assign roles}
+     
+
       <div className="px-4 sm:px-0">
         <h3 className="text-3xl font-semibold leading-7 text-gray-900">
           User's Giving History
