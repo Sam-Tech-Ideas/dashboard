@@ -5,6 +5,8 @@ import {
   getDocs,
   updateDoc,
   doc,
+  getDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import { Card, Typography } from "@material-tailwind/react";
 import Link from "next/link.js";
@@ -19,20 +21,20 @@ import {
 } from "@material-tailwind/react";
 import { CheckIcon } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { AddUser } from "@/components/user/AddUser";
 
 const Customers = () => {
-  const [users, setUsers] = useState([]);
-  const [user, setUser] = useState([]);
-  const [email, setEmail] = useState([]);
-  const [fullName, setFullName] = useState([]);
+const [users, setUsers] = useState([]);
 
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [blockAll, setBlockAll] = useState(false);
   const [sortOption, setSortOption] = useState("all"); // 'all', 'blocked', or 'unblocked'
   const [sortOrder, setSortOrder] = useState("asc");
- 
-  const password = "cosmic123"; //password for all users
+
+  //password for all users
+
   useEffect(() => {
     const fetchUsers = async () => {
       setLoading(true);
@@ -133,25 +135,26 @@ const Customers = () => {
 
   //authenticating user and storing in user database
   const addUser = async () => {
-     try{
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        const user = userCredential.user;
-        await db.collection("users").doc(user.uid).set({
-          fullName: fullName,
-          email: email,
-          block: false,
-          id: user.uid,
-        });
-        console.log("user added");
-     }
-     catch(error){
-       console.log(error)
-       toast.error(error.message);
-     }
-
-
     handleOpen();
   };
+
+  // ...
+  const handleDeleteUser = async (userId) => {
+    // Perform the deletion process
+    try {
+      // Delete the user document from the database
+      await deleteDoc(doc(db, "users", userId));
+
+      // Remove the user from the state (updated users list)
+      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
+
+      toast.success("User deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      toast.error("An error occurred while deleting the user.");
+    }
+  };
+  // ...
 
   return (
     <div className="">
@@ -160,25 +163,8 @@ const Customers = () => {
           <h2 className="text-3xl">All users</h2>
         </div>
 
-        {/* <div className="flex justify-end items-center">
-          <span className="px-2">Sort by block</span>
-          <select
-            className="rounded-md border-gray-500 py-2 px-8 border-2"
-            value={sortOption}
-            onChange={handleSortOptionChange}
-          >
-            <option value="all">All</option>
-            <option value="blocked">Blocked</option>
-            <option value="unblocked">Unblocked</option>
-          </select>
-        </div> */}
         <div className="flex justify-end  items-center">
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            onClick={addUser}
-          >
-            add user
-          </button>
+          <AddUser />
 
           <span className="px-2">Search</span>
           <input
@@ -189,14 +175,6 @@ const Customers = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        {/* <div className="flex justify-end  items-center">
-          <span className="px-2">Block all</span>
-          <input
-            type="checkbLinkox"
-            checked={blockAll}
-            onChange={handleBlockAllChange}
-          />
-        </div> */}
       </div>
 
       <Card className="overflow-scroll h-full w-full">
@@ -290,25 +268,18 @@ const Customers = () => {
                       {user.profileType}
                     </Typography>
                   </td>
-                  {/*  <td className="p-4">
-                   <form>
-                      <input
-                        type="checkbox"
-                        name=""
-                        id=""
-                        checked={user.block || false}
-                        onChange={(e) =>
-                          handleBlockChange(user.id, e.target.checked)
-                        }
-                      />
-                    </form> 
-                      </td>*/}
+
                   <td className="p-4">
                     <h2 className="text-blue-500">
                       <Link href="/users/[id]" as={`/users/${user.id}`}>
                         View Details
                       </Link>
                     </h2>
+                    {/* <button
+                      className="text-red-600 mt-2 underline cursor-pointer"
+                      onClick={() => deleteDoc(user.id)}>
+                      Delete
+                    </button> */}
                   </td>
                 </tr>
               ))
@@ -343,10 +314,10 @@ const Customers = () => {
       </div>
 
       <>
-        <Dialog open={open} handler={handleOpen}>
+        {/* <Dialog open={open} handler={handleOpen}>
           <DialogHeader>Creating a new user</DialogHeader>
           <DialogBody>
-            <form>
+            <form handleAddUser>
               <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2">
                   Full Name
@@ -354,6 +325,8 @@ const Customers = () => {
                 <input
                   type="text"
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  value={newUserFullName}
+                  onChange={(e) => setNewUserFullName(e.target.value)}
                 />
               </div>
               <div className="mb-4">
@@ -363,24 +336,26 @@ const Customers = () => {
                 <input
                   type="email"
                   className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+                  value={newUserEmail}
+                  onChange={(e) => setNewUserEmail(e.target.value)}
                 />
               </div>
+              <DialogFooter>
+                <Button
+                  variant="text"
+                  color="red"
+                  onClick={handleOpen}
+                  className="mr-1"
+                >
+                  <span>Cancel</span>
+                </Button>
+                <Button variant="gradient" color="green"  type="submit">
+                  <span>Create</span>
+                </Button>
+              </DialogFooter>
             </form>
           </DialogBody>
-          <DialogFooter>
-            <Button
-              variant="text"
-              color="red"
-              onClick={handleOpen}
-              className="mr-1"
-            >
-              <span>Cancel</span>
-            </Button>
-            <Button variant="gradient" color="green" onClick={handleOpen}>
-              <span>Create</span>
-            </Button>
-          </DialogFooter>
-        </Dialog>
+        </Dialog> */}
       </>
     </div>
   );

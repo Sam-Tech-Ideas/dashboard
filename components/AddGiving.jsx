@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import {
   Button,
   Dialog,
@@ -7,7 +7,7 @@ import {
   DialogFooter,
   Input,
 } from "@material-tailwind/react";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, getDocs } from "firebase/firestore";
 import { auth, db } from "@/firebase/config";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { toast } from "react-hot-toast";
@@ -25,7 +25,11 @@ const AddGiving = () => {
     giving_type: "",
     contact: "",
   });
-
+  const [users, setUsers] = useState([]);
+  // State to hold the filtered users based on input
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  // State to hold the value of the selected user
+  const [selectedUser, setSelectedUser] = useState("");
   const handleOpen = () => setOpen(!open);
 
   const handleAddGiving = async (e) => {
@@ -49,6 +53,72 @@ const AddGiving = () => {
       toast.error(error.message);
     }
   };
+
+   const [subcategories, setSubcategories] = useState([]);
+
+   // Function to fetch subcategories based on selected giving type
+   const fetchSubcategories = async (giving_type) => {
+     try {
+       const subcategoriesSnapshot = await getDocs(
+         collection(db, "subcategory")
+       );
+       const subcategoriesData = subcategoriesSnapshot.docs
+         .map((doc) => doc.data())
+         .filter(
+           (subcategory) => subcategory.type ===giving_type
+         );
+       setSubcategories(subcategoriesData);
+     } catch (error) {
+       console.error("Error fetching subcategories:", error);
+     }
+   };
+
+   useEffect(() => {
+     // Fetch subcategories when the selected giving type changes
+     fetchSubcategories(giving.giving_type);
+   }, [giving.giving_type]);
+ const fetchUsers = async () => {
+   try {
+     const usersSnapshot = await getDocs(collection(db, "users"));
+     const usersData = usersSnapshot.docs.map((doc) => doc.data());
+     setUsers(usersData);
+   } catch (error) {
+     console.error("Error fetching users:", error);
+   }
+ };
+
+ // Function to filter users based on input
+ const filterUsers = (input) => {
+   if (typeof input !== "undefined") {
+     const filtered = users.filter((user) =>
+       user.fullName.toLowerCase().includes(input.toLowerCase())
+     );
+     setFilteredUsers(filtered);
+   } else {
+     // Handle the case when input is undefined (e.g., clear filtered users)
+     setFilteredUsers([]);
+   }
+ };
+
+
+ useEffect(() => {
+   // Fetch all users when the component mounts
+   fetchUsers();
+ }, []);
+
+ // Handle user input change and filter users
+ const handleInputChange = (e) => {
+   const inputValue = e.target.value;
+   setSelectedUser(inputValue);
+   filterUsers(inputValue);
+ };
+
+ // Handle user selection from suggestions
+ const handleUserSelect = (user) => {
+   setGiving({ ...giving, full_name: user.fullName });
+   setSelectedUser(user.fullName);
+   setFilteredUsers([]);
+ };
 
   return (
     <div>
@@ -82,11 +152,24 @@ const AddGiving = () => {
                   placeholder="Giver's name"
                   className="border-2 border-gray-300 p-2 rounded-lg w-full"
                   required
-                  onChange={(e) =>
-                    setGiving({ ...giving, full_name: e.target.value })
-                  }
+                  value={selectedUser} // Display the selected user's name
+                  onChange={handleInputChange} // Handle user input change
                 />
+                {filteredUsers.length > 0 && (
+                  <ul className="border border-gray-300 bg-white absolute w-full z-10">
+                    {filteredUsers.map((user) => (
+                      <li
+                        key={user.id}
+                        className="cursor-pointer p-2 hover:bg-gray-100"
+                        onClick={() => handleUserSelect(user)}
+                      >
+                        {user.fullName}
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
+
               <div className="m-2">
                 <label htmlFor="">Giver's contact</label>
                 <input
@@ -117,6 +200,26 @@ const AddGiving = () => {
                   <option value="Partnership">Partnership</option>
                   <option value="Offering">Offering</option>
                   <option value="Others">Others</option>
+                </select>
+              </div>
+              <div className="m-2">
+                <label htmlFor="">
+                  Subcategory <span className="text-gray-400">(Ghc)</span>
+                </label>
+                <select
+                  className="border-2 border-gray-300 p-2 rounded-lg w-full"
+                  required
+                  value={giving.sub_category}
+                  onChange={(e) =>
+                    setGiving({ ...giving, sub_category: e.target.value })
+                  }
+                >
+                  {/* Display the fetched and filtered subcategories as options */}
+                  {subcategories.map((subcategory) => (
+                    <option key={subcategory.id} value={subcategory.name}>
+                      {subcategory.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 
