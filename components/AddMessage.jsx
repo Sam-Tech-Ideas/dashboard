@@ -24,55 +24,60 @@ const AddMessage = () => {
   const handleOpen = () => setOpen(!open);
 
   const [notification, setNotification] = useState({
-    id: nanoid(),
     title: "",
     message: "",
-    recipient: [], //this is an array of users
-    read: [],
-    date: new Date(),          //this is the date the notification was created
+    recipient: [""],
+    read: [""]
   });
-useEffect(() => {
-  
-  
-  const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
-    const tokens = [];
-    snapshot.forEach((doc) => {
-      const specificField = doc.data().fcmToken;
-      tokens.push(specificField);
-    });
-    setData(tokens);
-  });
-
-  return () => unsubscribe(); // Cleanup the listener on unmount
-}, []);
+  {/**fetch tokens from fcmToken which is a field of a user document in a users collection*/}
+  useEffect(() => {
+    const fetchTokens = async () => {
+      const querySnapshot = await getDocs(collection(db, "users"));
+      const tokens = querySnapshot.docs.map((doc) => doc.data().fcmToken);
+  //update recipient field of notification document with tokens
+      setNotification({ ...notification, recipient: tokens });
+      
+    };
+    fetchTokens();
+  }, []);
 
 
-   console.log(data);
-
-
- const handleAddNotification = async (e) => {
-   e.preventDefault();
-
-try {
-  const docRef = doc(db, "notifications", notification.id);
-
-  const notificationData = {
-    id: notification.id,
+  console.log('working',notification.recipient);
+const handleAddNotification = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  try {
+  //create a notification document in notifications collection
+  const docRef = doc(collection(db, "notifications"), nanoid());
+  await setDoc(docRef, {
+    id: docRef.id,
     title: notification.title,
     message: notification.message,
-    recipients: [...(notification.recipients || []), ...data], // Add the fetched data to the recipients array
-    read: [...(notification.read || []), ...data.map(() => "")], // Initialize read status for each recipient
-    date: notification.date,
-  };
-
-  await setDoc(docRef, notificationData);
-  toast.success("Notification created successfully");
-  handleOpen();
+    recipient: notification.recipient,
+    read: notification.read,
+    date: new Date().toLocaleString(),
+  });
+  toast.success("Message sent successfully");
+  setNotification({ title: "", message: "", recipient: [""], read: [""] });
+  setLoading(false);
+  setOpen(false);
 } catch (error) {
   toast.error(error.message);
+  setLoading(false);
   console.log(error.message);
+
 }
- }
+
+
+}
+
+
+
+
+
+
+
+   
 
   return (
     <div>
