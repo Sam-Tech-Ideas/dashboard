@@ -26,8 +26,9 @@ const AddMessage = () => {
   const [notification, setNotification] = useState({
     title: "",
     message: "",
-    recipient: [""],
-    read: [""]
+    recipient: [],//this is an array of strings which will contain tokens
+
+    read: []
   });
   {/**fetch tokens from fcmToken which is a field of a user document in a users collection*/}
   useEffect(() => {
