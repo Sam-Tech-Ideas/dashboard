@@ -179,26 +179,25 @@ const UserDetail = () => {
       },
     ],
   };
-const calculateTotalGivingsByType = () => {
-  const totalGivingsByType = {};
+  const calculateTotalGivingsByType = () => {
+    const totalGivingsByType = {};
 
-  // Initialize totalGivingsByType with all giving_types and set their initial amount to 0
-  givings.forEach((giving) => {
-    const { giving_type } = giving;
-    totalGivingsByType[giving_type] = 0;
-  });
+    // Initialize totalGivingsByType with all giving_types and set their initial amount to 0
+    givings.forEach((giving) => {
+      const { giving_type } = giving;
+      totalGivingsByType[giving_type] = 0;
+    });
 
-  // Increment the amounts for each giving_type
-  givings.forEach((giving) => {
-    const { giving_type, amount } = giving;
-    totalGivingsByType[giving_type] += amount;
-  });
+    // Increment the amounts for each giving_type
+    givings.forEach((giving) => {
+      const { giving_type, amount } = giving;
+      totalGivingsByType[giving_type] += amount;
+    });
 
-  return totalGivingsByType;
-};
+    return totalGivingsByType;
+  };
 
-const totalGivingsByType = calculateTotalGivingsByType();
-
+  const totalGivingsByType = calculateTotalGivingsByType();
 
   return (
     <div>
@@ -289,6 +288,51 @@ const totalGivingsByType = calculateTotalGivingsByType();
               </dt>
               <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
                 {user.phoneNumber}
+              </dd>
+            </div>
+            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+              <dt class="text-sm font-medium leading-6 text-gray-900">
+                Assign sub-roles
+              </dt>
+              <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                <ul>
+                  <li>
+                    <input
+                      type="checkbox"
+                      name="role"
+                      id="role"
+                      className="mr-2"
+                    />
+                    <label for="role">General admin</label>
+                  </li>
+                  <li>
+                    <input
+                      type="checkbox"
+                      name="role"
+                      id="role"
+                      className="mr-2"
+                    />
+                    <label for="role">Givings admin</label>
+                  </li>
+                  <li>
+                    <input
+                      type="checkbox"
+                      name="role"
+                      id="role"
+                      className="mr-2"
+                    />
+                    <label for="role">Events admin</label>
+                  </li>
+                  <li>
+                    <input
+                      type="checkbox"
+                      name="role"
+                      id="role"
+                      className="mr-2"
+                    />
+                    <label for="role">Groups admin</label>
+                  </li>
+                </ul>
               </dd>
             </div>
             {/* <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
