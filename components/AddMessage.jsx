@@ -28,19 +28,34 @@ const AddMessage = () => {
     message: "",
     recipients: [""],//this is an array of strings which will contain tokens
 
-    read: [""]
+    read: [],
   });
   {/**fetch tokenss from fcmToken which is a field of a user document in a users collection*/}
-  useEffect(() => {
-    const fetchTokens = async () => {
-      const querySnapshot = await getDocs(collection(db, "users"));
-      const tokens = querySnapshot.docs.map((doc) => doc.data().fcmToken);
-  //update recipient field of notification document with tokens
-      setNotification({ ...notification, recipients: tokens });
-      
-    };
-    fetchTokens();
-  }, []);
+   useEffect(
+     () => {
+       const fetchTokens = async () => {
+         const querySnapshot = await getDocs(collection(db, "users"));
+         const tokens = querySnapshot.docs.map((doc) => doc.data().fcmToken);
+         // Update recipient field of notification document with tokens
+         setNotification({ ...notification, recipients: tokens });
+       };
+
+       fetchTokens();
+
+       // Set up a Firestore listener for "users" collection to update tokens in real-time
+       const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
+         const tokens = snapshot.docs.map((doc) => doc.data().fcmToken);
+         // Update recipient field of notification document with updated tokens
+         setNotification({ ...notification, recipients: tokens });
+       });
+
+       // Clean up the listener when the component is unmounted
+       return () => unsubscribe();
+     },
+     [
+       /* Add any dependencies if needed */
+     ]
+   );
 
 
   console.log('working',notification.recipients);
@@ -56,7 +71,7 @@ const handleAddNotification = async (e) => {
     message: notification.message,
     recipients: notification.recipients,
     read: notification.read,
-    date: new Date().toLocaleString(),
+    date: new Date()
   });
   toast.success("Message sent successfully");
   setNotification({ title: "", message: "", recipient: [""], read: [""] });

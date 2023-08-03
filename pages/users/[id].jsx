@@ -296,42 +296,77 @@ const UserDetail = () => {
               </dt>
               <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
                 <ul>
-                  <li>
-                    <input
-                      type="checkbox"
-                      name="role"
-                      id="role"
-                      className="mr-2"
-                    />
-                    <label for="role">General admin</label>
-                  </li>
-                  <li>
-                    <input
-                      type="checkbox"
-                      name="role"
-                      id="role"
-                      className="mr-2"
-                    />
-                    <label for="role">Givings admin</label>
-                  </li>
-                  <li>
-                    <input
-                      type="checkbox"
-                      name="role"
-                      id="role"
-                      className="mr-2"
-                    />
-                    <label for="role">Events admin</label>
-                  </li>
-                  <li>
-                    <input
-                      type="checkbox"
-                      name="role"
-                      id="role"
-                      className="mr-2"
-                    />
-                    <label for="role">Groups admin</label>
-                  </li>
+                  {
+
+                  
+                    user.profileType === "admin" ? (
+                    <>
+
+
+                      <li>
+                        <input
+                          type="checkbox"
+                          name="role"
+                          id="role"
+                          className="mr-2"
+                        />
+                        <label for="role">General admin</label>
+                      </li>
+                      <li>
+                        <input
+                          type="checkbox"
+                          name="role"
+                          id="role"
+                          className="mr-2"
+                        />
+                        <label for="role">Givings admin</label>
+                      </li>
+                      <li>
+                        <input
+                          type="checkbox"
+                          name="role"
+                          id="role"
+                          className="mr-2"
+                        />
+                        <label for="role">Events admin</label>
+                      </li>
+                      <li>
+                        <input
+                          type="checkbox"
+                          name="role"
+                          id="role"
+                          className="mr-2"
+                        />
+                        <label for="role">Groups admin</label>
+                      </li>
+                    </>
+                  ) : user.profileType === "user" ? (
+                    <>
+                      <li>
+
+                        <input
+                          type="checkbox"
+                          name="role"
+                          id="role"
+                          className="mr-2"
+                        />
+                        <label for="role">
+                          Group Leader
+                        </label>
+                      </li>
+                    </>
+                  ):(
+                    <>
+                    <h1>
+                      No role available
+                    </h1>
+                    </>
+                  )
+                  
+        
+
+                  
+                  }
                 </ul>
               </dd>
             </div>
