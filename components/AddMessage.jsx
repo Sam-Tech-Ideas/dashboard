@@ -26,24 +26,24 @@ const AddMessage = () => {
   const [notification, setNotification] = useState({
     title: "",
     message: "",
-    recipient: [],//this is an array of strings which will contain tokens
+    recipients: [""],//this is an array of strings which will contain tokens
 
-    read: []
+    read: [""]
   });
-  {/**fetch tokens from fcmToken which is a field of a user document in a users collection*/}
+  {/**fetch tokenss from fcmToken which is a field of a user document in a users collection*/}
   useEffect(() => {
     const fetchTokens = async () => {
       const querySnapshot = await getDocs(collection(db, "users"));
       const tokens = querySnapshot.docs.map((doc) => doc.data().fcmToken);
   //update recipient field of notification document with tokens
-      setNotification({ ...notification, recipient: tokens });
+      setNotification({ ...notification, recipients: tokens });
       
     };
     fetchTokens();
   }, []);
 
 
-  console.log('working',notification.recipient);
+  console.log('working',notification.recipients);
 const handleAddNotification = async (e) => {
   e.preventDefault();
   setLoading(true);
@@ -54,7 +54,7 @@ const handleAddNotification = async (e) => {
     id: docRef.id,
     title: notification.title,
     message: notification.message,
-    recipient: notification.recipient,
+    recipients: notification.recipients,
     read: notification.read,
     date: new Date().toLocaleString(),
   });
